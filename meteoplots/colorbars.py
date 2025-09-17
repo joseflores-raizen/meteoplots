@@ -1,4 +1,4 @@
-def custom_colorbar(variavel_plotagem):
+def custom_colorbar(variavel_plotagem=None, help=False):
 
     import numpy as np
     import matplotlib.pyplot as plt
@@ -331,7 +331,13 @@ def custom_colorbar(variavel_plotagem):
         },
     }
 
-    if variavel_plotagem not in configs:
+    if help:
+        print("Variáveis configuradas:")
+        for var in configs.keys():
+            print(f"- {var}")
+        return
+
+    if variavel_plotagem not in configs or variavel_plotagem is None:
         raise ValueError(f"Variável {variavel_plotagem} não configurada!")
 
     cfg = configs[variavel_plotagem]
