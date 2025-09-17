@@ -333,8 +333,99 @@ def custom_colorbar(variavel_plotagem=None, help=False):
 
     if help:
         print("Variáveis configuradas:")
-        for var in configs.keys():
+        
+        # Create a figure with subplots for each variable
+        import math
+        num_vars = len(configs)
+        cols = 4
+        rows = math.ceil(num_vars / cols)
+        
+        fig, axes = plt.subplots(rows, cols, figsize=(20, 5 * rows))
+        if rows == 1:
+            axes = axes.reshape(1, -1)
+        
+        for i, var in enumerate(configs.keys()):
+            row = i // cols
+            col = i % cols
+            ax = axes[row, col]
+            
             print(f"- {var}")
+            
+            try:
+                # Get configuration for this variable
+                cfg = configs[var]
+                
+                # Resolve levels if it's a function
+                levels = cfg["levels"]() if callable(cfg["levels"]) else cfg["levels"]
+                colors = cfg["colors"]
+                
+                # Resolve cbar_ticks if it's a function
+                cbar_ticks = cfg["cbar_ticks"]
+                if callable(cbar_ticks):
+                    if cbar_ticks.__code__.co_argcount == 0:
+                        cbar_ticks = cbar_ticks()
+                    else:
+                        cbar_ticks = cbar_ticks(list(levels))
+                
+                # Generate cmap
+                cmap_config = cfg["cmap"]
+                if callable(cmap_config):
+                    arg_count = cmap_config.__code__.co_argcount
+                    if arg_count == 1:
+                        cmap = cmap_config(colors)
+                    elif arg_count == 2:
+                        cmap = cmap_config(colors, list(levels))
+                    else:
+                        cmap = cmap_config()
+                elif isinstance(cmap_config, str):
+                    cmap = cmap_config
+                else:
+                    cmap = cmap_config
+                
+                # Create a sample data array for visualization
+                if hasattr(levels, '__len__'):
+                    data = np.linspace(min(levels), max(levels), 100).reshape(10, 10)
+                else:
+                    # For range objects, convert to list first
+                    levels_list = list(levels)
+                    data = np.linspace(min(levels_list), max(levels_list), 100).reshape(10, 10)
+                
+                # Plot the colorbar preview
+                if colors and cmap is None:
+                    # Create a custom colormap from discrete colors
+                    from matplotlib.colors import ListedColormap
+                    cmap_preview = ListedColormap(colors[:len(levels)-1] if len(colors) >= len(levels) else colors)
+                    im = ax.imshow(data, cmap=cmap_preview, aspect='auto')
+                elif cmap:
+                    im = ax.imshow(data, cmap=cmap, aspect='auto')
+                else:
+                    # Fallback to viridis if no colormap available
+                    im = ax.imshow(data, cmap='viridis', aspect='auto')
+                
+                ax.set_title(var, fontsize=10, fontweight='bold')
+                ax.set_xticks([])
+                ax.set_yticks([])
+                
+                # Add a small colorbar
+                plt.colorbar(im, ax=ax, shrink=0.8)
+                
+            except Exception as e:
+                # If there's an error, just show the variable name
+                ax.text(0.5, 0.5, var, ha='center', va='center', transform=ax.transAxes, 
+                       fontsize=10, fontweight='bold')
+                ax.text(0.5, 0.3, f"Error: {str(e)[:30]}...", ha='center', va='center', 
+                       transform=ax.transAxes, fontsize=8, color='red')
+                ax.set_xticks([])
+                ax.set_yticks([])
+        
+        # Hide empty subplots
+        for i in range(num_vars, rows * cols):
+            row = i // cols
+            col = i % cols
+            axes[row, col].set_visible(False)
+        
+        plt.tight_layout()
+        plt.show()
         return
 
     if variavel_plotagem not in configs or variavel_plotagem is None:
