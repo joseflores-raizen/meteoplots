@@ -7,4 +7,14 @@ name = "meteoplots"
 version = "0.1.0"
 description = "Funções para plotagem meteorológica"
 authors = [{ name = "Jose Flores" }]
-dependencies = []
+
+dependencies = [
+    "xarray",
+    "matplotlib",
+    "cartopy",
+    "numpy",
+    "netcdf4",
+    "eccodes",
+    "geopandas",
+    "pandas",
+]
