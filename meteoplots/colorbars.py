@@ -2,7 +2,7 @@ def custom_colorbar(variavel_plotagem=None, help=False):
 
     import numpy as np
     import matplotlib.pyplot as plt
-    from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+    from matplotlib.colors import ListedColormap, LinearSegmentedColormap, BoundaryNorm
 
     configs = {
         "chuva_ons": {
@@ -337,10 +337,10 @@ def custom_colorbar(variavel_plotagem=None, help=False):
         # Create a figure with subplots for each variable showing only colorbars
         import math
         num_vars = len(configs)
-        cols = 6
+        cols = 3
         rows = math.ceil(num_vars / cols)
         
-        fig, axes = plt.subplots(rows, cols, figsize=(18, 2.5 * rows))
+        fig, axes = plt.subplots(rows, cols, figsize=(18, 3 * rows))
         if rows == 1:
             axes = axes.reshape(1, -1)
         
@@ -385,7 +385,6 @@ def custom_colorbar(variavel_plotagem=None, help=False):
                 # Create colorbar only (no image)
                 if colors and cmap is None:
                     # Create a custom colormap from discrete colors
-                    from matplotlib.colors import ListedColormap, BoundaryNorm
                     if hasattr(levels, '__len__'):
                         levels_list = list(levels)
                     else:
@@ -409,13 +408,13 @@ def custom_colorbar(variavel_plotagem=None, help=False):
                     cmap_preview = 'viridis'
                     norm = plt.Normalize(vmin=min(levels_list), vmax=max(levels_list))
                 
-                # Create a colorbar without an image
+                # Create a colorbar without an image in horizontal orientation
                 sm = plt.cm.ScalarMappable(cmap=cmap_preview, norm=norm)
                 sm.set_array([])
                 
-                # Remove axes and just show colorbar
+                # Remove axes and just show colorbar horizontally
                 ax.set_visible(False)
-                cbar = plt.colorbar(sm, ax=ax, fraction=1.0, aspect=20)
+                cbar = plt.colorbar(sm, ax=ax, orientation='horizontal', fraction=1.0, aspect=30, pad=0.1)
                 cbar.set_label(var, fontsize=10, fontweight='bold')
                 
                 # Set ticks if available
