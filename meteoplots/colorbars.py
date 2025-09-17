@@ -334,13 +334,13 @@ def custom_colorbar(variavel_plotagem=None, help=False):
     if help:
         print("Variáveis configuradas:")
         
-        # Create a figure with subplots for each variable
+        # Create a figure with subplots for each variable showing only colorbars
         import math
         num_vars = len(configs)
-        cols = 4
+        cols = 6
         rows = math.ceil(num_vars / cols)
         
-        fig, axes = plt.subplots(rows, cols, figsize=(20, 5 * rows))
+        fig, axes = plt.subplots(rows, cols, figsize=(18, 2.5 * rows))
         if rows == 1:
             axes = axes.reshape(1, -1)
         
@@ -382,32 +382,46 @@ def custom_colorbar(variavel_plotagem=None, help=False):
                 else:
                     cmap = cmap_config
                 
-                # Create a sample data array for visualization
-                if hasattr(levels, '__len__'):
-                    data = np.linspace(min(levels), max(levels), 100).reshape(10, 10)
-                else:
-                    # For range objects, convert to list first
-                    levels_list = list(levels)
-                    data = np.linspace(min(levels_list), max(levels_list), 100).reshape(10, 10)
-                
-                # Plot the colorbar preview
+                # Create colorbar only (no image)
                 if colors and cmap is None:
                     # Create a custom colormap from discrete colors
-                    from matplotlib.colors import ListedColormap
-                    cmap_preview = ListedColormap(colors[:len(levels)-1] if len(colors) >= len(levels) else colors)
-                    im = ax.imshow(data, cmap=cmap_preview, aspect='auto')
+                    from matplotlib.colors import ListedColormap, BoundaryNorm
+                    if hasattr(levels, '__len__'):
+                        levels_list = list(levels)
+                    else:
+                        levels_list = list(levels)
+                    
+                    cmap_preview = ListedColormap(colors[:len(levels_list)-1] if len(colors) >= len(levels_list) else colors)
+                    norm = BoundaryNorm(levels_list, cmap_preview.N)
                 elif cmap:
-                    im = ax.imshow(data, cmap=cmap, aspect='auto')
+                    if hasattr(levels, '__len__'):
+                        levels_list = list(levels)
+                    else:
+                        levels_list = list(levels)
+                    cmap_preview = cmap
+                    norm = plt.Normalize(vmin=min(levels_list), vmax=max(levels_list))
                 else:
                     # Fallback to viridis if no colormap available
-                    im = ax.imshow(data, cmap='viridis', aspect='auto')
+                    if hasattr(levels, '__len__'):
+                        levels_list = list(levels)
+                    else:
+                        levels_list = list(levels)
+                    cmap_preview = 'viridis'
+                    norm = plt.Normalize(vmin=min(levels_list), vmax=max(levels_list))
                 
-                ax.set_title(var, fontsize=10, fontweight='bold')
-                ax.set_xticks([])
-                ax.set_yticks([])
+                # Create a colorbar without an image
+                sm = plt.cm.ScalarMappable(cmap=cmap_preview, norm=norm)
+                sm.set_array([])
                 
-                # Add a small colorbar
-                plt.colorbar(im, ax=ax, shrink=0.8)
+                # Remove axes and just show colorbar
+                ax.set_visible(False)
+                cbar = plt.colorbar(sm, ax=ax, fraction=1.0, aspect=20)
+                cbar.set_label(var, fontsize=10, fontweight='bold')
+                
+                # Set ticks if available
+                if cbar_ticks is not None:
+                    if hasattr(cbar_ticks, '__len__') and len(cbar_ticks) <= 10:
+                        cbar.set_ticks(list(cbar_ticks))
                 
             except Exception as e:
                 # If there's an error, just show the variable name
