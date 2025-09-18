@@ -250,6 +250,51 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
                           transform=ccrs.PlateCarree(), transform_first=True)
             plt.clabel(cf, inline=True, fmt='%.0f', fontsize=15, colors=color)
 
+    # Plot quiver (wind vectors)
+    if 'quiver' in plot_types and 'quiver' in xarray_data:
+        print('Plotting quiver...')
+        
+        # Get quiver parameters
+        quiver_skip = kwargs.get('quiver_skip', 5)  # Skip every N points for cleaner display
+        quiver_scale = kwargs.get('quiver_scale', None)  # Scale factor for arrow length
+        quiver_width = kwargs.get('quiver_width', 0.003)  # Arrow width
+        quiver_color = kwargs.get('quiver_color', 'black')  # Arrow color
+        quiver_alpha = kwargs.get('quiver_alpha', 0.8)  # Arrow transparency
+        
+        # Expect quiver data to have 'u_quiver' and 'v_quiver' components
+        u_data = xarray_data['u_quiver']
+        v_data = xarray_data['v_quiver']
+        
+        # Get coordinate data for quiver (might be different resolution than shaded/contour)
+        if lon_grid is None or lat_grid is None:
+            quiv_lon_data = u_data[dim_lon]
+            quiv_lat_data = u_data[dim_lat]
+            quiv_lon_grid, quiv_lat_grid = np.meshgrid(quiv_lon_data, quiv_lat_data)
+        else:
+            quiv_lon_grid, quiv_lat_grid = lon_grid, lat_grid
+        
+        # Subsample for cleaner display
+        quiv_lon_sub = quiv_lon_grid[::quiver_skip, ::quiver_skip]
+        quiv_lat_sub = quiv_lat_grid[::quiver_skip, ::quiver_skip]
+        u_sub = u_data[::quiver_skip, ::quiver_skip]
+        v_sub = v_data[::quiver_skip, ::quiver_skip]
+        
+        # Plot quiver
+        qv = ax.quiver(quiv_lon_sub, quiv_lat_sub, u_sub, v_sub,
+                      transform=ccrs.PlateCarree(), transform_first=True,
+                      scale=quiver_scale, width=quiver_width, 
+                      color=quiver_color, alpha=quiver_alpha)
+        
+        # Add quiver key if requested
+        quiver_key = kwargs.get('quiver_key', None)
+        if quiver_key:
+            key_length = quiver_key.get('length', 10)
+            key_label = quiver_key.get('label', f'{key_length} m/s')
+            key_position = quiver_key.get('position', (0.9, 0.95))
+            
+            ax.quiverkey(qv, key_position[0], key_position[1], key_length, key_label,
+                        labelpos='E', coordinates='axes', fontproperties={'size': 12})
+
     # Add shapefiles once at the end
     if gdfs:
         print('Adding shapefiles...')
