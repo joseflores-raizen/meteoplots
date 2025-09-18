@@ -23,6 +23,7 @@ def get_base_ax(extent, figsize, central_longitude=0):
 def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='latitude', dim_lon='longitude', shapefiles=None, normalize_colorbar=False, **kwargs):
 
     from meteoplots.colorbar.colorbars import custom_colorbar
+    from meteoplots.utils.utils import calcula_media_bacia
     from matplotlib.colors import BoundaryNorm
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
     import geopandas as gpd
@@ -104,12 +105,63 @@ def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='lati
     # Title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
 
+    # # Adicionando valores das bacias
+    # if kwargs.get('add_valor_bacias', False):
+
+    #     import xarray as xr
+    #     import pandas as pd
+
+    #     # criando a var para tp no dataset se nao existir, o valor será o mesmo
+    #     ds = ds.to_dataset()
+    #     if 'tp' not in ds.data_vars:
+    #         varname = list(ds.data_vars.keys())[0]  # pega o primeiro nome de variável
+    #         ds = ds.rename({varname: "tp"})
+
+    #     chuva_media = []
+    #     for lat, lon, bacia, codigo in zip(shp['lat'], shp['lon'], shp['nome'], shp['cod']):
+    #         chuva_media.append(calcula_media_bacia(ds, lat, lon, bacia, codigo, shp))
+
+    #     df = xr.concat(chuva_media, dim='id').to_dataframe().reset_index()
+    #     df = df.rename(columns={'id': 'cod_psat'})
+    #     df_ons = get_df_ons()
+    #     df = pd.merge(df, df_ons, on='cod_psat', how='left')
+    #     media_bacia = df.groupby(['nome_bacia'])[['tp', 'vl_lat', 'vl_lon']].mean().reset_index()
+    #     bacias_para_plotar = [
+    #         'grande',
+    #         'iguaçu',
+    #         'itaipu',
+    #         'jacuí',
+    #         'madeira',
+    #         'paranapane',
+    #         'paranaíba',
+    #         'tietê',
+    #         'uruguai',
+    #         'paraná',
+    #         'xingu',
+    #         'tocantins',
+    #         'são franci',
+    #     ]
+
+    #     # Itera sobre as bacias e adiciona as anotações no mapa
+    #     for idx, row in media_bacia.iterrows():
+
+    #         if row['nome_bacia'].lower() in bacias_para_plotar:
+
+    #             if not np.isnan(row['tp']):  # Garante que há valor para exibir
+    #                 lon, lat = row["vl_lon"], row["vl_lat"]  # Extrai coordenadas do centroide
+    #                 lon = lon+360
+    #                 ax.text(lon, lat, f"{row['tp']:.0f}", fontsize=13, color='black', fontweight='bold', ha='center', va='center', transform=ccrs.PlateCarree())
+    #                         # bbox=dict(facecolor='white', alpha=0.7, edgecolor='none')c
+    #                         # )
+
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
         os.makedirs(path_save, exist_ok=True)
         plt.savefig(f'{path_save}/{output_filename}', bbox_inches='tight')
         plt.close(fig)
         print(f'✅ Plot saved as {path_save}/{output_filename}')
+
+        
     return fig, ax
 
 def plot_contour_from_xarray(xarray_data, dim_lat='latitude', dim_lon='longitude', shapefiles=None, **kwargs):
