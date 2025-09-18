@@ -147,7 +147,172 @@ def plot_contour_from_xarray(xarray_data, dim_lat='latitude', dim_lon='longitude
 
     return fig, ax
 
-def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_lon='longitude', shapefiles=None, plot_types=['shaded', 'contour', 'quiver'], **kwargs):
+def plot_quiver_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon='longitude', shapefiles=None, **kwargs):
+
+    '''Plot quiver (wind vectors) from xarray DataArrays for u and v components'''
+
+    import geopandas as gpd
+    import numpy as np
+    import os
+
+    # Default parameters
+    extent = kwargs.get('extent', [240, 360, -60, 20])
+    figsize = kwargs.get('figsize', (12, 12))
+    central_longitude = kwargs.get('central_longitude', 0)
+    title_size = kwargs.get('title_size', 16)
+    title = kwargs.get('title', '')
+    path_save = kwargs.get('path_save', './tmp/plots')
+    output_filename = kwargs.get('output_filename', 'quiver_plot.png')
+
+    # Quiver parameters
+    quiver_skip = kwargs.get('quiver_skip', 2)  # Skip every N points for cleaner display
+
+    # Create figure and axis
+    extent = tuple(extent)
+    figsize = tuple(figsize)
+    fig, ax = kwargs.get('fig', None), kwargs.get('ax', None)
+    if fig is None or ax is None:
+        fig, ax = get_base_ax(extent=extent, figsize=figsize, central_longitude=central_longitude)
+
+    # Create coordinate grids
+    lon, lat = np.meshgrid(xarray_u[dim_lon], xarray_u[dim_lat])
+    
+    # Subsample for cleaner display
+    lon_sub = lon[::quiver_skip, ::quiver_skip]
+    lat_sub = lat[::quiver_skip, ::quiver_skip]
+    u_sub = xarray_u[::quiver_skip, ::quiver_skip]
+    v_sub = xarray_v[::quiver_skip, ::quiver_skip]
+
+    # Plot quiver
+    quiver_kwargs= kwargs.get('quiver_kwargs', {'headlength': 4, 'headwidth': 3,'angles': 'uv', 'scale':400})
+    qv = ax.quiver(lon_sub, lat_sub, u_sub, v_sub,
+                  transform=ccrs.PlateCarree(), zorder=5,
+                  **quiver_kwargs)
+
+    # Add quiver key if requested
+    quiver_key = kwargs.get('quiver_key', None)
+    if quiver_key:
+        key_length = quiver_key.get('length', 10)
+        key_label = quiver_key.get('label', f'{key_length} m/s')
+        key_position = quiver_key.get('position', (0.9, 0.95))
+        
+        ax.quiverkey(qv, key_position[0], key_position[1], key_length, key_label,
+                    labelpos='E', coordinates='axes', fontproperties={'size': 12})
+
+    # Shapefiles if provided
+    if shapefiles is not None:
+        for shapefile in shapefiles:
+            gdf = gpd.read_file(shapefile)
+            gdf.plot(ax=ax, facecolor='none', edgecolor='black', linewidths=1, alpha=0.5, transform=ccrs.PlateCarree())
+
+    # Title
+    ax.set_title(title, fontsize=title_size)
+
+    savefigure_kwargs = kwargs.get('savefigure', True)
+    if savefigure_kwargs:
+        os.makedirs(path_save, exist_ok=True)
+        plt.savefig(f'{path_save}/{output_filename}', bbox_inches='tight')
+        plt.close(fig)
+        print(f'✅ Plot saved as {path_save}/{output_filename}')
+
+    return fig, ax
+
+def plot_streamplot_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon='longitude', shapefiles=None, **kwargs):
+
+    '''Plot streamlines from xarray DataArrays for u and v components'''
+
+    import geopandas as gpd
+    import numpy as np
+    import os
+
+    # Default parameters
+    extent = kwargs.get('extent', [240, 360, -60, 20])
+    figsize = kwargs.get('figsize', (12, 12))
+    central_longitude = kwargs.get('central_longitude', 0)
+    title_size = kwargs.get('title_size', 16)
+    title = kwargs.get('title', '')
+    path_save = kwargs.get('path_save', './tmp/plots')
+    output_filename = kwargs.get('output_filename', 'streamplot.png')
+
+    # Streamplot parameters
+    stream_kwargs = kwargs.get('stream_kwargs', {
+        'density': 2,
+        'color': 'black',
+        'linewidth': 1.0,
+        'arrowsize': 1.0,
+        'arrowstyle': '->',
+    })
+
+    # Create figure and axis
+    extent = tuple(extent)
+    figsize = tuple(figsize)
+    fig, ax = kwargs.get('fig', None), kwargs.get('ax', None)
+    if fig is None or ax is None:
+        fig, ax = get_base_ax(extent=extent, figsize=figsize, central_longitude=central_longitude)
+
+    # Get coordinate arrays
+    lon_data = xarray_u[dim_lon].values
+    lat_data = xarray_u[dim_lat].values
+    u_data = xarray_u.values
+    v_data = xarray_v.values
+
+    # Check and convert longitude dimension if needed (0-360 to -180-180)
+    if lon_data.max() > 180:
+        print("Converting longitude from 0-360 to -180-180 degrees...")
+        # Convert longitude values
+        lon_data = np.where(lon_data > 180, lon_data - 360, lon_data)
+        
+        # Sort indices for proper ordering
+        sort_idx = np.argsort(lon_data)
+        lon_data = lon_data[sort_idx]
+        u_data = u_data[:, sort_idx]
+        v_data = v_data[:, sort_idx]
+
+    # Create coordinate grids
+    lon_grid, lat_grid = np.meshgrid(lon_data, lat_data)
+
+    # Create streamplot
+    stream = ax.streamplot(lon_grid, lat_grid, u_data, v_data,
+                          transform=ccrs.PlateCarree(),
+                          **stream_kwargs
+                          )
+
+    # Add magnitude-based coloring if requested
+    stream_color_by_magnitude = kwargs.get('stream_color_by_magnitude', False)
+    if stream_color_by_magnitude:
+        # remove color from stream_kwargs to avoid conflict
+        if 'color' in stream_kwargs:
+            del stream_kwargs['color']
+        magnitude = np.sqrt(u_data**2 + v_data**2)
+        stream = ax.streamplot(lon_grid, lat_grid, u_data, v_data,
+                               color=magnitude, transform=ccrs.PlateCarree(), cmap=kwargs.get('stream_cmap', 'viridis'), **stream_kwargs)
+        
+        # Add colorbar for magnitude
+        if kwargs.get('stream_colorbar', True):
+            from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+            axins = inset_axes(ax, width="95%", height="2%", loc='lower center', borderpad=-3.6)
+            cb = fig.colorbar(stream.lines, cax=axins, orientation='horizontal', 
+                            label=kwargs.get('stream_colorbar_label', 'Wind Speed (m/s)'))
+
+    # Shapefiles if provided
+    if shapefiles is not None:
+        for shapefile in shapefiles:
+            gdf = gpd.read_file(shapefile)
+            gdf.plot(ax=ax, facecolor='none', edgecolor='black', linewidths=1, alpha=0.5, transform=ccrs.PlateCarree())
+
+    # Title
+    ax.set_title(title, fontsize=title_size)
+
+    savefigure_kwargs = kwargs.get('savefigure', True)
+    if savefigure_kwargs:
+        os.makedirs(path_save, exist_ok=True)
+        plt.savefig(f'{path_save}/{output_filename}', bbox_inches='tight')
+        plt.close(fig)
+        print(f'✅ Plot saved as {path_save}/{output_filename}')
+
+    return fig, ax
+
+def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_lon='longitude', shapefiles=None, plot_types=['shaded', 'contour', 'quiver', 'streamplot'], **kwargs):
 
     '''Plot multiple types of data (shaded, contour lines, wind barbs) from an xarray Dataset'''
     
@@ -184,6 +349,35 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
     lat_data = None
     lon_grid = None
     lat_grid = None
+    
+    # Pre-process wind data coordinates if quiver or streamplot are requested
+    wind_lon_data = None
+    wind_lat_data = None
+    wind_lon_grid = None
+    wind_lat_grid = None
+    u_wind_data = None
+    v_wind_data = None
+    
+    if ('quiver' in plot_types or 'streamplot' in plot_types) and 'u_quiver' in xarray_data and 'v_quiver' in xarray_data:
+        print('Pre-processing wind data coordinates...')
+        u_data = xarray_data['u_quiver']
+        v_data = xarray_data['v_quiver']
+        
+        wind_lon_data = u_data[dim_lon].values
+        wind_lat_data = u_data[dim_lat].values
+        u_wind_data = u_data.values
+        v_wind_data = v_data.values
+        
+        # Check and convert longitude dimension if needed (0-360 to -180-180)
+        if wind_lon_data.max() > 180:
+            print("Converting longitude from 0-360 to -180-180 degrees for wind data...")
+            wind_lon_data = np.where(wind_lon_data > 180, wind_lon_data - 360, wind_lon_data)
+            sort_idx = np.argsort(wind_lon_data)
+            wind_lon_data = wind_lon_data[sort_idx]
+            u_wind_data = u_wind_data[:, sort_idx]
+            v_wind_data = v_wind_data[:, sort_idx]
+        
+        wind_lon_grid, wind_lat_grid = np.meshgrid(wind_lon_data, wind_lat_data)
     
     if 'shaded' in plot_types or 'contour' in plot_types:
         # Get coordinate data from the first available dataset
@@ -242,11 +436,9 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
         contour_levels = kwargs.get('contour_levels', [np.arange(np.nanmin(xarray_data['contour']), np.nanmax(xarray_data['contour']), 1)])
         colors_levels = kwargs.get('colors_levels', ['red'])
         styles_levels = kwargs.get('styles_levels', ['solid'])
-        
+
         # Plot all contour levels efficiently
         for color, level, style in zip(colors_levels, contour_levels, styles_levels):
-
-            print(color, level, style)
 
             cf = ax.contour(lon_grid, lat_grid, xarray_data['contour'], levels=level, 
                           colors=color, linestyles=style, linewidths=1.5, 
@@ -260,17 +452,11 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
         # Get quiver parameters
         quiver_skip = kwargs.get('quiver_skip', 2)  # Skip every N points for cleaner display
         
-        # Expect quiver data to have 'u_quiver' and 'v_quiver' components
-        u_data = xarray_data['u_quiver']
-        v_data = xarray_data['v_quiver']
-        
-        # Get coordinate data for quiver (might be different resolution than shaded/contour)
-        if lon_grid is None or lat_grid is None:
-            quiv_lon_data = u_data[dim_lon]
-            quiv_lat_data = u_data[dim_lat]
-            quiv_lon_grid, quiv_lat_grid = np.meshgrid(quiv_lon_data, quiv_lat_data)
-        else:
-            quiv_lon_grid, quiv_lat_grid = lon_grid, lat_grid
+        # Use pre-processed wind data
+        quiv_lon_grid = wind_lon_grid
+        quiv_lat_grid = wind_lat_grid
+        u_data = u_wind_data
+        v_data = v_wind_data
         
         # Subsample for cleaner display
         quiv_lon_sub = quiv_lon_grid[::quiver_skip, ::quiver_skip]
@@ -293,6 +479,49 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
             ax.quiverkey(qv, key_position[0], key_position[1], key_length, key_label,
                         labelpos='E', coordinates='axes', fontproperties={'size': 12})
 
+    # Plot streamlines
+    if 'streamplot' in plot_types and 'u_quiver' in xarray_data and 'v_quiver' in xarray_data:
+        print('Plotting streamlines...')
+        
+        # Get streamplot parameters
+        streamplot_kwargs = kwargs.get('streamplot_kwargs', {
+            'density': 2,
+            'color': 'blue',
+            'linewidth': 1.0,
+            'arrowsize': 1.0,
+            'arrowstyle': '->',
+        })
+        
+        # Use pre-processed wind data
+        stream_lon_grid = wind_lon_grid
+        stream_lat_grid = wind_lat_grid
+        u_stream_data = u_wind_data
+        v_stream_data = v_wind_data
+        
+        # Create streamplot
+        stream_color_by_magnitude = kwargs.get('stream_color_by_magnitude', False)
+        if stream_color_by_magnitude:
+            magnitude = np.sqrt(u_stream_data**2 + v_stream_data**2)
+            # For magnitude coloring, remove 'color' from streamplot_kwargs to avoid conflict
+            streamplot_kwargs_mag = streamplot_kwargs.copy()
+            if 'color' in streamplot_kwargs_mag:
+                del streamplot_kwargs_mag['color']
+            stream = ax.streamplot(stream_lon_grid, stream_lat_grid, u_stream_data, v_stream_data,
+                                  transform=ccrs.PlateCarree(),
+                                  color=magnitude,
+                                  cmap=kwargs.get('stream_cmap', 'viridis'),
+                                  **streamplot_kwargs_mag)
+            
+            # Add colorbar for magnitude if not already present
+            if kwargs.get('stream_colorbar', True) and 'shaded' not in plot_types:
+                axins = inset_axes(ax, width="95%", height="2%", loc='lower center', borderpad=-3.6)
+                cb = fig.colorbar(stream.lines, cax=axins, orientation='horizontal', 
+                                label=kwargs.get('stream_colorbar_label', 'Wind Speed (m/s)'))
+        else:
+            stream = ax.streamplot(stream_lon_grid, stream_lat_grid, u_stream_data, v_stream_data,
+                                  transform=ccrs.PlateCarree(),
+                                  **streamplot_kwargs)
+
     # Add shapefiles once at the end
     if gdfs:
         print('Adding shapefiles...')
@@ -313,6 +542,6 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
         plt.close(fig)
         print(f'✅ Plot saved as {path_save}/{output_filename}')
     
-    return fig, ax
+    return
 
 
