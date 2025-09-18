@@ -256,7 +256,7 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
         
         # Get quiver parameters
         quiver_skip = kwargs.get('quiver_skip', 5)  # Skip every N points for cleaner display
-        quiver_scale = kwargs.get('quiver_scale', None)  # Scale factor for arrow length
+        quiver_scale = kwargs.get('quiver_scale', 200)  # Scale factor for arrow length
         quiver_width = kwargs.get('quiver_width', 0.003)  # Arrow width
         quiver_color = kwargs.get('quiver_color', 'black')  # Arrow color
         quiver_alpha = kwargs.get('quiver_alpha', 0.8)  # Arrow transparency
