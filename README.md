@@ -27,7 +27,7 @@ from meteoplots.plots import plot_contourf_from_xarray
 # Exemplo básico
 fig, ax = plot_contourf_from_xarray(
     xarray_data=temperatura_data,
-    plot_var='temperature',
+    plot_var_colorbar='temperature',
     title='Temperatura do Ar - 2m',
     extent=[-60, -30, -35, 5],  # [lon_min, lon_max, lat_min, lat_max]
     figsize=(12, 8)
@@ -36,7 +36,7 @@ fig, ax = plot_contourf_from_xarray(
 
 **Parâmetros principais:**
 - `xarray_data`: Dados em formato xarray DataArray
-- `plot_var`: Variável meteorológica para colorbar automática
+- `plot_var_colorbar`: Variável meteorológica para colorbar automática
 - `dim_lat/dim_lon`: Nomes das dimensões de latitude/longitude
 - `extent`: Extensão geográfica [lon_min, lon_max, lat_min, lat_max]
 - `normalize_colorbar`: Normalização da barra de cores
@@ -120,7 +120,7 @@ fig, ax = plot_multipletypes_from_xarray(
         'u_quiver': u_component,
         'v_quiver': v_component
     },
-    plot_var='temperature',
+    plot_var_colorbar='temperature',
     plot_types=['contourf', 'contour', 'quiver', 'streamplot'],
     title='Análise Meteorológica Completa',
     extent=[-60, -30, -35, 5],
@@ -166,6 +166,33 @@ path_save = './figuras'
 output_filename = 'meu_grafico.png'
 ```
 
+### 🛡️ **Configuração de Colorbars**
+```python
+# Método 1: Usar colorbar pré-configurada (recomendado)
+plot_contourf_from_xarray(data, plot_var_colorbar='tp')
+
+# Método 2: Configuração manual com levels e colors
+plot_contourf_from_xarray(
+    data, 
+    levels=[0, 5, 10, 15, 20], 
+    colors=['blue', 'green', 'yellow', 'red']
+)
+
+# Método 3: Configuração manual com levels e cmap
+plot_contourf_from_xarray(
+    data, 
+    levels=[0, 5, 10, 15, 20], 
+    cmap='viridis'
+)
+
+# ❌ Erro: sem plot_var_colorbar nem configuração manual
+# plot_contourf_from_xarray(data)  # Gerará ValueError
+```
+
+**Importante:** Se `plot_var_colorbar=None`, você **deve** fornecer:
+- `levels` **E** `colors`, ou
+- `levels` **E** `cmap`
+
 ### 📂 **Shapefiles**
 ```python
 # Adicionar contornos de países/estados
@@ -191,7 +218,7 @@ pres_data = xr.open_dataarray('pressao.nc')
 # Plotar
 plot_multipletypes_from_xarray(
     xarray_data={'contourf': temp_data, 'contour': pres_data},
-    plot_var='temperature',
+    plot_var_colorbar='temperature',
     plot_types=['contourf', 'contour'],
     title='Temperatura + Pressão',
     extent=[-75, -30, -35, 10],
@@ -242,7 +269,7 @@ custom_colorbar(help=True)
 # Plotar com colorbar automática
 plot_contourf_from_xarray(
     xarray_data=temp_data,
-    plot_var='temp850',  # Usar colorbar pré-configurada
+    plot_var_colorbar='temp850',  # Usar colorbar pré-configurada
     title=titulo,
     extent=[-60, -30, -35, 5],
     label_colorbar='Temperatura (°C)'

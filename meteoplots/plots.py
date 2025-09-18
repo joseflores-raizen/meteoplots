@@ -20,7 +20,7 @@ def get_base_ax(extent, figsize, central_longitude=0):
 
     return fig, ax
 
-def plot_contourf_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_lon='longitude', shapefiles=None, normalize_colorbar=False, **kwargs):
+def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='latitude', dim_lon='longitude', shapefiles=None, normalize_colorbar=False, **kwargs):
 
     from meteoplots.colorbar.colorbars import custom_colorbar
     from matplotlib.colors import BoundaryNorm
@@ -44,7 +44,24 @@ def plot_contourf_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', di
     output_filename = kwargs.get('output_filename', 'contourf_plot.png')
 
     # Colormap and levels
-    levels, colors, cmap, cbar_ticks = custom_colorbar(plot_var)
+    if plot_var_colorbar is None:
+        # If no plot_var_colorbar provided, user must provide colorbar parameters manually
+        levels = kwargs.get('levels', None)
+        colors = kwargs.get('colors', None)
+        cmap = kwargs.get('cmap', None)
+        cbar_ticks = kwargs.get('cbar_ticks', None)
+        
+        # Check if required colorbar parameters are provided
+        if levels is None or (colors is None and cmap is None):
+            raise ValueError(
+                "When plot_var_colorbar is None, you must provide either:\n"
+                "1. 'levels' and 'colors' parameters, or\n"
+                "2. 'levels' and 'cmap' parameters\n"
+                "Example: plot_contourf_from_xarray(data, levels=[0,5,10], colors=['blue','red'])\n"
+                "Or use: plot_contourf_from_xarray(data, plot_var_colorbar='tp')"
+            )
+    else:
+        levels, colors, cmap, cbar_ticks = custom_colorbar(variavel_plotagem=plot_var_colorbar)
 
     if colors is not None and cmap is not None:
         colors = None
@@ -314,7 +331,7 @@ def plot_streamplot_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon=
 
     return fig, ax
 
-def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_lon='longitude', shapefiles=None, plot_types=['contourf', 'contour', 'quiver', 'streamplot'], **kwargs):
+def plot_multipletypes_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='latitude', dim_lon='longitude', shapefiles=None, plot_types=['contourf', 'contour', 'quiver', 'streamplot'], **kwargs):
 
     '''Plot multiple types of data (contourf, contour lines, wind vectors, streamlines) from an xarray Dataset'''
     
@@ -398,8 +415,25 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
     if 'contourf' in plot_types and 'contourf' in xarray_data:
         print('Plotting contourf...')
         
-        # Get colorbar configuration
-        levels, colors, cmap, cbar_ticks = custom_colorbar(plot_var)
+        # Colormap and levels
+        if plot_var_colorbar is None:
+            # If no plot_var_colorbar provided, user must provide colorbar parameters manually
+            levels = kwargs.get('levels', None)
+            colors = kwargs.get('colors', None)
+            cmap = kwargs.get('cmap', None)
+            cbar_ticks = kwargs.get('cbar_ticks', None)
+            
+            # Check if required colorbar parameters are provided
+            if levels is None or (colors is None and cmap is None):
+                raise ValueError(
+                    "When plot_var_colorbar is None, you must provide either:\n"
+                    "1. 'levels' and 'colors' parameters, or\n"
+                    "2. 'levels' and 'cmap' parameters\n"
+                    "Example: plot_multipletypes_from_xarray(data, levels=[0,5,10], colors=['blue','red'])\n"
+                    "Or use: plot_multipletypes_from_xarray(data, plot_var_colorbar='tp')"
+                )
+        else:
+            levels, colors, cmap, cbar_ticks = custom_colorbar(variavel_plotagem=plot_var_colorbar)
         
         if colors is not None and cmap is not None:
             colors = None
