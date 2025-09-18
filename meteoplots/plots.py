@@ -256,10 +256,6 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
         
         # Get quiver parameters
         quiver_skip = kwargs.get('quiver_skip', 2)  # Skip every N points for cleaner display
-        quiver_scale = kwargs.get('quiver_scale', 200)  # Scale factor for arrow length
-        quiver_width = kwargs.get('quiver_width', 0.003)  # Arrow width
-        quiver_color = kwargs.get('quiver_color', 'black')  # Arrow color
-        quiver_alpha = kwargs.get('quiver_alpha', 0.8)  # Arrow transparency
         
         # Expect quiver data to have 'u_quiver' and 'v_quiver' components
         u_data = xarray_data['u_quiver']
@@ -280,10 +276,9 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
         v_sub = v_data[::quiver_skip, ::quiver_skip]
         
         # Plot quiver
-        quiver_kwargs= {'headlength': 4, 'headwidth': 3,'angles': 'uv', 'scale':400}
+        quiver_kwargs= kwargs.get('quiver_kwargs', {'headlength': 4, 'headwidth': 3,'angles': 'uv', 'scale':400})
         qv = ax.quiver(quiv_lon_sub, quiv_lat_sub, u_sub, v_sub, zorder=5,
-                      transform=ccrs.PlateCarree(), transform_first=True,
-                      **quiver_kwargs)
+                      transform=ccrs.PlateCarree(), **quiver_kwargs)
 
         # Add quiver key if requested
         quiver_key = kwargs.get('quiver_key', None)
@@ -306,10 +301,9 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
     ax.set_title(title, fontsize=title_size)
 
     # Handle saving
-    savefigure_shaded = kwargs.get('savefigure_shaded', False)
-    savefigure_contour = kwargs.get('savefigure_contour', False)
+    savefigure = kwargs.get('savefigure', True)
     
-    if savefigure_shaded or savefigure_contour:
+    if savefigure:
         os.makedirs(path_save, exist_ok=True)
         output_filename = kwargs.get('output_filename', 'multiple_plot.png')
         plt.savefig(f'{path_save}/{output_filename}', bbox_inches='tight')
