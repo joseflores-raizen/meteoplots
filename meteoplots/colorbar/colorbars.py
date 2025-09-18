@@ -1,4 +1,4 @@
-def custom_colorbar(variavel_plotagem=None, help=False):
+def custom_colorbar(variavel_plotagem=None, help=False, custom=False):
 
     import numpy as np
     import matplotlib.pyplot as plt
@@ -329,6 +329,12 @@ def custom_colorbar(variavel_plotagem=None, help=False):
             ),
             "cbar_ticks": lambda: np.arange(-3, 3.5, 0.5),
         },
+        "custom": {
+            "levels": custom.get("levels") if custom else None,
+            "colors": custom.get("colors") if custom else None,
+            "cmap": custom.get("cmap") if custom else None,
+            "cbar_ticks": custom.get("cbar_ticks") if custom else None,
+        }
     }
 
     if help:

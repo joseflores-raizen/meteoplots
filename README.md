@@ -216,18 +216,128 @@ plot_multipletypes_from_xarray(
 )
 ```
 
+### Exemplo 3: Usando Funções Utilitárias
+```python
+from meteoplots.plots import plot_contourf_from_xarray
+from meteoplots.colorbars import custom_colorbar
+from meteoplots.utils.titles import gerar_titulo
+import datetime
+
+# Carregar dados
+temp_data = xr.open_dataarray('temperatura.nc')
+
+# Gerar título profissional
+titulo = gerar_titulo(
+    titulo_principal="Temperatura do Ar",
+    nivel="850 hPa",
+    unidade="°C",
+    modelo="GFS",
+    data=datetime.datetime(2024, 1, 15, 12, 0),
+    subtitulo="Análise"
+)
+
+# Verificar colorbars disponíveis
+custom_colorbar(help=True)
+
+# Plotar com colorbar automática
+plot_contourf_from_xarray(
+    xarray_data=temp_data,
+    plot_var='temp850',  # Usar colorbar pré-configurada
+    title=titulo,
+    extent=[-60, -30, -35, 5],
+    label_colorbar='Temperatura (°C)'
+)
+```
+
 ---
 
 ## 🎨 **Colorbars Automáticas**
 
-A biblioteca inclui colorbars pré-configuradas para variáveis meteorológicas:
+A biblioteca inclui colorbars pré-configuradas para variáveis meteorológicas através da função `custom_colorbar()`.
 
-- `temperature`: Temperaturas do ar
-- `precipitation`: Precipitação
-- `wind_speed`: Velocidade do vento
-- `pressure`: Pressão atmosférica
-- `humidity`: Umidade relativa
-- E muitas outras...
+### `custom_colorbar()`
+Gera automaticamente níveis, cores e colormaps para variáveis meteorológicas específicas.
+
+```python
+from meteoplots.colorbars import custom_colorbar
+
+# Obter configuração de colorbar para precipitação
+levels, colors, cmap, cbar_ticks = custom_colorbar('tp')
+
+# Ver todas as variáveis disponíveis
+custom_colorbar(help=True)
+```
+
+**Variáveis disponíveis incluem:**
+- **Precipitação**: `tp`, `chuva_ons`, `chuva_pnmm`, `tp_anomalia`, `tp_anomalia_mensal`
+- **Temperatura**: `temp850`, `temp_anomalia`
+- **Vento**: `wind200`, `mag_vento100`, `mag_vento100_anomalia`
+- **Pressão**: `pnmm_vento`, `geop_500`, `geop_500_anomalia`
+- **Oceanografia**: `sst_anomalia`
+- **Campos dinâmicos**: `psi`, `chi`, `vorticidade`, `divergencia850`
+- **Outros**: `olr`, `ivt`, `frentes`, `probabilidade`, `geada-inmet`
+
+**Parâmetros:**
+- `variavel_plotagem`: Nome da variável meteorológica
+- `help`: Se `True`, mostra todas as variáveis disponíveis com preview visual
+
+**Retorna:**
+- `levels`: Níveis para contorno/colorbar
+- `colors`: Lista de cores (se aplicável)
+- `cmap`: Colormap do matplotlib
+- `cbar_ticks`: Posições dos ticks na colorbar
+
+---
+
+## 📝 **Geração de Títulos**
+
+### `gerar_titulo()`
+Gera títulos formatados e informativos para gráficos meteorológicos.
+
+```python
+from meteoplots.utils.titles import gerar_titulo
+
+# Título simples
+titulo = gerar_titulo(
+    titulo_principal="Temperatura do Ar",
+    nivel="2m",
+    unidade="°C"
+)
+
+# Título completo com metadados
+titulo = gerar_titulo(
+    titulo_principal="Precipitação Acumulada",
+    subtitulo="Previsão 24h",
+    data="15/01/2024 12:00",
+    nivel="Superfície", 
+    unidade="mm",
+    modelo="GFS",
+    fonte="NOAA"
+)
+```
+
+**Parâmetros principais:**
+- `titulo_principal`: Título principal (ex: "Temperatura do Ar")
+- `subtitulo`: Informação adicional
+- `data`: Data/hora (string ou datetime)
+- `nivel`: Nível atmosférico (ex: "850 hPa", "Superfície")
+- `unidade`: Unidade de medida (ex: "°C", "mm/h")
+- `modelo`: Nome do modelo (ex: "GFS", "ERA5")
+- `fonte`: Fonte dos dados
+- `bold_subtitle`: Formatação em negrito (LaTeX)
+- `include_datetime`: Incluir timestamp de geração
+
+**Exemplo de saída:**
+```
+Temperatura do Ar - 2m (°C)
+𝐀𝐧á𝐥𝐢𝐬𝐞\ |\ 𝐌𝐨𝐝𝐞𝐥𝐨:\ 𝐆𝐅𝐒\ |\ 𝐃𝐚𝐭𝐚:\ 𝟏𝟓/𝟎𝟏/𝟐𝟎𝟐𝟒\ |\ 𝐆𝐞𝐫𝐚𝐝𝐨\ 𝐞𝐦:\ 𝟏𝟖/𝟎𝟗/𝟐𝟎𝟐𝟓
+```
+
+**Características:**
+- **Formatação automática**: LaTeX para texto em negrito
+- **Timestamp automático**: Data/hora de geração
+- **Flexível**: Combine apenas os parâmetros necessários
+- **Padrão profissional**: Adequado para relatórios científicos
 
 ---
 
