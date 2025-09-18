@@ -242,9 +242,12 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
         contour_levels = kwargs.get('contour_levels', [np.arange(np.nanmin(xarray_data['contour']), np.nanmax(xarray_data['contour']), 1)])
         colors_levels = kwargs.get('colors_levels', ['red'])
         styles_levels = kwargs.get('styles_levels', ['solid'])
-
+        
         # Plot all contour levels efficiently
         for color, level, style in zip(colors_levels, contour_levels, styles_levels):
+
+            print(color, level, style)
+
             cf = ax.contour(lon_grid, lat_grid, xarray_data['contour'], levels=level, 
                           colors=color, linestyles=style, linewidths=1.5, 
                           transform=ccrs.PlateCarree(), transform_first=True)
