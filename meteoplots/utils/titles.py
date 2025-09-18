@@ -1,3 +1,5 @@
+
+
 def generate_title(titulo_principal=None, subtitulo=None, data=None, nivel=None, 
                  unidade=None, modelo=None, fonte=None, bold_subtitle=True, 
                  include_datetime=False):

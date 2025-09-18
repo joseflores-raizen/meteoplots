@@ -1,3 +1,4 @@
+
 def calcula_media_bacia(dataset, lat, lon, bacia, codigo, shp):
 
     import regionmask
@@ -20,6 +21,7 @@ def calcula_media_bacia(dataset, lat, lon, bacia, codigo, shp):
             media = media.drop_vars(['latitude', 'longitude'])
 
     return media.expand_dims({'id': [codigo]})
+
 
 def figures_panel(path_figs: str | list, output_file='panel.png', path_to_save='./tmp/paineis/', img_size=(6,6), ncols=None, nrows=None):
 
