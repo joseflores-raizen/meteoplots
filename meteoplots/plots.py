@@ -314,7 +314,7 @@ def plot_streamplot_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon=
 
 def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_lon='longitude', shapefiles=None, plot_types=['shaded', 'contour', 'quiver', 'streamplot'], **kwargs):
 
-    '''Plot multiple types of data (shaded, contour lines, wind barbs) from an xarray Dataset'''
+    '''Plot multiple types of data (shaded, contour lines, wind vectors, streamlines) from an xarray Dataset'''
     
     from meteoplots.colorbars import custom_colorbar
     from matplotlib.colors import BoundaryNorm
@@ -543,5 +543,3 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
         print(f'✅ Plot saved as {path_save}/{output_filename}')
     
     return
-
-
