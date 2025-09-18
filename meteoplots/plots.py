@@ -20,7 +20,7 @@ def get_base_ax(extent, figsize, central_longitude=0):
 
     return fig, ax
 
-def plot_shaded_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_lon='longitude', shapefiles=None, normalize_colorbar=False, **kwargs):
+def plot_contourf_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_lon='longitude', shapefiles=None, normalize_colorbar=False, **kwargs):
 
     from meteoplots.colorbar.colorbars import custom_colorbar
     from matplotlib.colors import BoundaryNorm
@@ -29,7 +29,7 @@ def plot_shaded_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_
     import numpy as np
     import os
 
-    '''Plot shaded data from an xarray DataArray'''
+    '''Plot contourf data from an xarray DataArray'''
 
     # Default parameters
     extent = kwargs.get('extent', [240, 360, -60, 20])
@@ -37,10 +37,11 @@ def plot_shaded_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_
     central_longitude = kwargs.get('central_longitude', 0)
     title_size = kwargs.get('title_size', 16)
     title = kwargs.get('title', '')
+    title_loc = kwargs.get('title_loc', 'left')
     colorbar_position = kwargs.get('colorbar_position', 'horizontal')
     label_colorbar = kwargs.get('label_colorbar', '')
     path_save = kwargs.get('path_save', './tmp/plots')
-    output_filename = kwargs.get('output_filename', 'shaded_plot.png')
+    output_filename = kwargs.get('output_filename', 'contourf_plot.png')
 
     # Colormap and levels
     levels, colors, cmap, cbar_ticks = custom_colorbar(plot_var)
@@ -61,7 +62,7 @@ def plot_shaded_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_
     if fig is None or ax is None:
         fig, ax = get_base_ax(extent=extent, figsize=figsize, central_longitude=central_longitude)
 
-    # Plot shaded data
+    # Plot contourf data
     lon, lat = np.meshgrid(xarray_data[dim_lon], xarray_data[dim_lat])
     cf = ax.contourf(lon, lat, xarray_data, transform=ccrs.PlateCarree(), transform_first=True, origin='upper', levels=levels, colors=colors, extend='both', cmap=cmap, norm=norm)
 
@@ -84,7 +85,7 @@ def plot_shaded_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_
             gdf.plot(ax=ax, facecolor='none', edgecolor='black', linewidths=1, alpha=0.5, transform=ccrs.PlateCarree())
 
     # Title
-    ax.set_title(title, fontsize=title_size)
+    ax.set_title(title, fontsize=title_size, loc=title_loc)
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -102,16 +103,15 @@ def plot_contour_from_xarray(xarray_data, dim_lat='latitude', dim_lon='longitude
     import numpy as np
     import os
 
-    '''Plot shaded data from an xarray DataArray'''
-
     # Default parameters
     extent = kwargs.get('extent', [240, 360, -60, 20])
     figsize = kwargs.get('figsize', (12, 12))
     central_longitude = kwargs.get('central_longitude', 0)
     title_size = kwargs.get('title_size', 16)
+    title_loc = kwargs.get('title_loc', 'left')
     title = kwargs.get('title', '')
     path_save = kwargs.get('path_save', './tmp/plots')
-    output_filename = kwargs.get('output_filename', 'shaded_plot.png')
+    output_filename = kwargs.get('output_filename', 'contour_plot.png')
 
     # Create figure and axis
     extent = tuple(extent)
@@ -120,7 +120,7 @@ def plot_contour_from_xarray(xarray_data, dim_lat='latitude', dim_lon='longitude
     if fig is None or ax is None:
         fig, ax = get_base_ax(extent=extent, figsize=figsize, central_longitude=central_longitude)
 
-    # Plot shaded data
+    # Plot contour data
     lon, lat = np.meshgrid(xarray_data[dim_lon], xarray_data[dim_lat])
     contour_levels = kwargs.get('contour_levels', [np.arange(np.nanmin(xarray_data), np.nanmax(xarray_data), 5)])
     colors_levels = kwargs.get('colors_levels', ['red'])
@@ -136,7 +136,7 @@ def plot_contour_from_xarray(xarray_data, dim_lat='latitude', dim_lon='longitude
             gdf.plot(ax=ax, facecolor='none', edgecolor='black', linewidths=1, alpha=0.5, transform=ccrs.PlateCarree())
 
     # Title
-    ax.set_title(title, fontsize=title_size)
+    ax.set_title(title, fontsize=title_size, loc=title_loc)
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -160,6 +160,7 @@ def plot_quiver_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon='lon
     figsize = kwargs.get('figsize', (12, 12))
     central_longitude = kwargs.get('central_longitude', 0)
     title_size = kwargs.get('title_size', 16)
+    title_loc = kwargs.get('title_loc', 'left')
     title = kwargs.get('title', '')
     path_save = kwargs.get('path_save', './tmp/plots')
     output_filename = kwargs.get('output_filename', 'quiver_plot.png')
@@ -206,7 +207,7 @@ def plot_quiver_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon='lon
             gdf.plot(ax=ax, facecolor='none', edgecolor='black', linewidths=1, alpha=0.5, transform=ccrs.PlateCarree())
 
     # Title
-    ax.set_title(title, fontsize=title_size)
+    ax.set_title(title, fontsize=title_size, loc=title_loc)
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -230,6 +231,7 @@ def plot_streamplot_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon=
     figsize = kwargs.get('figsize', (12, 12))
     central_longitude = kwargs.get('central_longitude', 0)
     title_size = kwargs.get('title_size', 16)
+    title_loc = kwargs.get('title_loc', 'left')
     title = kwargs.get('title', '')
     path_save = kwargs.get('path_save', './tmp/plots')
     output_filename = kwargs.get('output_filename', 'streamplot.png')
@@ -301,7 +303,7 @@ def plot_streamplot_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon=
             gdf.plot(ax=ax, facecolor='none', edgecolor='black', linewidths=1, alpha=0.5, transform=ccrs.PlateCarree())
 
     # Title
-    ax.set_title(title, fontsize=title_size)
+    ax.set_title(title, fontsize=title_size, loc=title_loc)
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -312,9 +314,9 @@ def plot_streamplot_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon=
 
     return fig, ax
 
-def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_lon='longitude', shapefiles=None, plot_types=['shaded', 'contour', 'quiver', 'streamplot'], **kwargs):
+def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_lon='longitude', shapefiles=None, plot_types=['contourf', 'contour', 'quiver', 'streamplot'], **kwargs):
 
-    '''Plot multiple types of data (shaded, contour lines, wind vectors, streamlines) from an xarray Dataset'''
+    '''Plot multiple types of data (contourf, contour lines, wind vectors, streamlines) from an xarray Dataset'''
     
     from meteoplots.colorbar.colorbars import custom_colorbar
     from matplotlib.colors import BoundaryNorm
@@ -328,6 +330,7 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
     figsize = kwargs.get('figsize', (12, 12))
     central_longitude = kwargs.get('central_longitude', 0)
     title_size = kwargs.get('title_size', 16)
+    title_loc = kwargs.get('title_loc', 'left')
     title = kwargs.get('title', '')
     path_save = kwargs.get('path_save', './tmp/plots')
     normalize_colorbar = kwargs.get('normalize_colorbar', False)
@@ -379,11 +382,11 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
         
         wind_lon_grid, wind_lat_grid = np.meshgrid(wind_lon_data, wind_lat_data)
     
-    if 'shaded' in plot_types or 'contour' in plot_types:
+    if 'contourf' in plot_types or 'contour' in plot_types:
         # Get coordinate data from the first available dataset
-        if 'shaded' in plot_types and 'shaded' in xarray_data:
-            lon_data = xarray_data['shaded'][dim_lon]
-            lat_data = xarray_data['shaded'][dim_lat]
+        if 'contourf' in plot_types and 'contourf' in xarray_data:
+            lon_data = xarray_data['contourf'][dim_lon]
+            lat_data = xarray_data['contourf'][dim_lat]
         elif 'contour' in plot_types and 'contour' in xarray_data:
             lon_data = xarray_data['contour'][dim_lon]
             lat_data = xarray_data['contour'][dim_lat]
@@ -391,9 +394,9 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
         if lon_data is not None and lat_data is not None:
             lon_grid, lat_grid = np.meshgrid(lon_data, lat_data)
 
-    # Plot shaded data
-    if 'shaded' in plot_types and 'shaded' in xarray_data:
-        print('Plotting shaded...')
+    # Plot contourf data
+    if 'contourf' in plot_types and 'contourf' in xarray_data:
+        print('Plotting contourf...')
         
         # Get colorbar configuration
         levels, colors, cmap, cbar_ticks = custom_colorbar(plot_var)
@@ -407,14 +410,14 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
             norm = None
         
         # Plot using pre-computed coordinates
-        cf = ax.contourf(lon_grid, lat_grid, xarray_data['shaded'], 
+        cf = ax.contourf(lon_grid, lat_grid, xarray_data['contourf'], 
                         transform=ccrs.PlateCarree(), transform_first=True, 
                         origin='upper', levels=levels, colors=colors, 
                         extend='both', cmap=cmap, norm=norm)
         
         # Add colorbar
         colorbar_position = kwargs.get('colorbar_position', 'horizontal')
-        label_colorbar = kwargs.get('label_colorbar', '')
+        label_colorbar = kwargs.get('label_colorbar', '[units]')
         
         if colorbar_position == 'vertical':
             axins = inset_axes(ax, width="3%", height="100%", loc='right', borderpad=-2.7)
@@ -513,7 +516,7 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
                                   **streamplot_kwargs_mag)
             
             # Add colorbar for magnitude if not already present
-            if kwargs.get('stream_colorbar', True) and 'shaded' not in plot_types:
+            if kwargs.get('stream_colorbar', True) and 'contourf' not in plot_types:
                 axins = inset_axes(ax, width="95%", height="2%", loc='lower center', borderpad=-3.6)
                 cb = fig.colorbar(stream.lines, cax=axins, orientation='horizontal', 
                                 label=kwargs.get('stream_colorbar_label', 'Wind Speed (m/s)'))
@@ -530,7 +533,7 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
                     alpha=0.5, transform=ccrs.PlateCarree())
 
     # Set title
-    ax.set_title(title, fontsize=title_size)
+    ax.set_title(title, fontsize=title_size, loc=title_loc)
 
     # Handle saving
     savefigure = kwargs.get('savefigure', True)
