@@ -329,12 +329,7 @@ def custom_colorbar(variavel_plotagem=None, help=False, custom=False):
             ),
             "cbar_ticks": lambda: np.arange(-3, 3.5, 0.5),
         },
-        "custom": {
-            "levels": custom.get("levels") if custom else None,
-            "colors": custom.get("colors") if custom else None,
-            "cmap": custom.get("cmap") if custom else None,
-            "cbar_ticks": custom.get("cbar_ticks") if custom else None,
-        }
+
     }
 
     if help:
@@ -447,38 +442,46 @@ def custom_colorbar(variavel_plotagem=None, help=False, custom=False):
         plt.show()
         return
 
-    if variavel_plotagem not in configs or variavel_plotagem is None:
-        raise ValueError(f"Variável {variavel_plotagem} não configurada!")
+    if variavel_plotagem is not None:
 
-    cfg = configs[variavel_plotagem]
+        if variavel_plotagem not in configs:
+            raise ValueError(f"Variável {variavel_plotagem} não configurada!")
 
-    # Resolve levels if it's a function
-    levels = cfg["levels"]() if callable(cfg["levels"]) else cfg["levels"]
-    
-    colors = cfg["colors"]
-    
-    # Resolve cbar_ticks if it's a function
-    cbar_ticks = cfg["cbar_ticks"]
-    if callable(cbar_ticks):
-        if cbar_ticks.__code__.co_argcount == 0:
-            cbar_ticks = cbar_ticks()
+        cfg = configs[variavel_plotagem]
+
+        # Resolve levels if it's a function
+        levels = cfg["levels"]() if callable(cfg["levels"]) else cfg["levels"]
+        
+        colors = cfg["colors"]
+        
+        # Resolve cbar_ticks if it's a function
+        cbar_ticks = cfg["cbar_ticks"]
+        if callable(cbar_ticks):
+            if cbar_ticks.__code__.co_argcount == 0:
+                cbar_ticks = cbar_ticks()
+            else:
+                cbar_ticks = cbar_ticks(levels)
+
+        # Generate cmap
+        cmap_config = cfg["cmap"]
+        if callable(cmap_config):
+            # Check function signature to determine how to call it
+            arg_count = cmap_config.__code__.co_argcount
+            if arg_count == 1:
+                cmap = cmap_config(colors)
+            elif arg_count == 2:
+                cmap = cmap_config(colors, levels)
+            else:
+                cmap = cmap_config()
+        elif isinstance(cmap_config, str):
+            cmap = cmap_config
         else:
-            cbar_ticks = cbar_ticks(levels)
+            cmap = cmap_config
 
-    # Generate cmap
-    cmap_config = cfg["cmap"]
-    if callable(cmap_config):
-        # Check function signature to determine how to call it
-        arg_count = cmap_config.__code__.co_argcount
-        if arg_count == 1:
-            cmap = cmap_config(colors)
-        elif arg_count == 2:
-            cmap = cmap_config(colors, levels)
-        else:
-            cmap = cmap_config()
-    elif isinstance(cmap_config, str):
-        cmap = cmap_config
-    else:
-        cmap = cmap_config
+    if custom:
+        levels = custom.get("levels")
+        colors = custom.get("colors")
+        cmap = custom.get("cmap")
+        cbar_ticks = custom.get("cbar_ticks")
 
     return levels, colors, cmap, cbar_ticks
