@@ -22,7 +22,7 @@ def get_base_ax(extent, figsize, central_longitude=0):
 
 def plot_shaded_from_xarray(xarray_data, plot_var: str, dim_lat='latitude', dim_lon='longitude', shapefiles=None, normalize_colorbar=False, **kwargs):
 
-    from meteoplots.colorbars import custom_colorbar
+    from meteoplots.colorbar.colorbars import custom_colorbar
     from matplotlib.colors import BoundaryNorm
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
     import geopandas as gpd
@@ -316,7 +316,7 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
 
     '''Plot multiple types of data (shaded, contour lines, wind vectors, streamlines) from an xarray Dataset'''
     
-    from meteoplots.colorbars import custom_colorbar
+    from meteoplots.colorbar.colorbars import custom_colorbar
     from matplotlib.colors import BoundaryNorm
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
     import geopandas as gpd
