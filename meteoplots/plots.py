@@ -251,7 +251,7 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var: str, dim_lat='latitude
             plt.clabel(cf, inline=True, fmt='%.0f', fontsize=15, colors=color)
 
     # Plot quiver (wind vectors)
-    if 'quiver' in plot_types and 'quiver' in xarray_data:
+    if 'quiver' in plot_types and 'quiver_u' in xarray_data and 'quiver_v' in xarray_data:
         print('Plotting quiver...')
         
         # Get quiver parameters
