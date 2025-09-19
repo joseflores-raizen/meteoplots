@@ -13,7 +13,7 @@ def calculate_mean_basin_value_from_shapefile(dataset, basin, shp, dim_lat='lat'
 
     return mean_mask
 
-def figures_panel(path_figs: str | list, output_file='panel.png', path_to_save='./tmp/paineis/', img_size=(6,6), ncols=None, nrows=None):
+def figures_panel(path_figs, output_file='panel.png', path_to_save='./tmp/paineis/', img_size=(6,6), ncols=None, nrows=None):
 
     import matplotlib.pyplot as plt 
     from PIL import Image
