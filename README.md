@@ -10,6 +10,7 @@ Você pode instalar diretamente a partir do GitHub:
 
 ```bash
 pip install git+https://github.com/joseflores-raizen/meteoplots.git
+pip install --upgrade --force-reinstall --no-cache-dir git+https://github.com/joseflores-raizen/meteoplots.git@main
 ```
 
 ---
