@@ -42,6 +42,34 @@ fig, ax = plot_contourf_from_xarray(
 - `normalize_colorbar`: Normalização da barra de cores
 - `shapefiles`: Lista de shapefiles para sobreposição
 
+**Parâmetros para análise de bacias:**
+- `shp_path_bacias`: Caminho para shapefile de bacias hidrográficas
+- `add_values_from_shapefile`: Se `True`, adiciona valores médios das bacias no mapa
+- `basin_column_name`: Nome da coluna com identificação das bacias (padrão: 'Nome_Bacia')
+
+#### Exemplo com Análise de Bacias
+```python
+# Exemplo com cálculo de valores médios por bacia
+fig, ax = plot_contourf_from_xarray(
+    xarray_data=precipitacao_data,
+    plot_var_colorbar='tp',
+    title='Precipitação por Bacia Hidrográfica',
+    extent=[-60, -30, -35, 5],
+    
+    # Parâmetros para análise de bacias
+    shp_path_bacias='path/to/bacias_hidrograficas.shp',
+    add_values_from_shapefile=True,
+    basin_column_name='Nome_Bacia',  # Nome da coluna com ID das bacias
+    
+    figsize=(12, 8)
+)
+```
+
+**Funcionalidade de Bacias:**
+- Calcula automaticamente o valor médio de cada bacia
+- Adiciona anotações no centróide de cada bacia
+- Útil para análise hidrológica e climatológica regional
+
 #### `plot_contour_from_xarray()`
 Cria linhas de contorno a partir de dados xarray.
 
@@ -243,7 +271,37 @@ plot_multipletypes_from_xarray(
 )
 ```
 
-### Exemplo 3: Usando Funções Utilitárias
+### Exemplo 3: Análise de Bacias Hidrográficas
+```python
+from meteoplots.plots import plot_contourf_from_xarray
+import xarray as xr
+
+# Carregar dados de precipitação
+precip_data = xr.open_dataarray('precipitacao_mensal.nc')
+
+# Análise por bacias com valores médios
+fig, ax = plot_contourf_from_xarray(
+    xarray_data=precip_data,
+    plot_var_colorbar='tp',  # Colorbar de precipitação
+    title='Precipitação Média por Bacia Hidrográfica',
+    extent=[-75, -30, -35, 10],  # Brasil
+    
+    # Configuração de bacias
+    shp_path_bacias='data/bacias_hidrograficas_brasil.shp',
+    add_values_from_shapefile=True,
+    basin_column_name='Nome_Bacia',
+    
+    # Sobreposição de estados
+    shapefiles=['data/estados_brasil.shp'],
+    
+    # Configurações visuais
+    colorbar_position='horizontal',
+    label_colorbar='Precipitação (mm/mês)',
+    figsize=(15, 10)
+)
+```
+
+### Exemplo 4: Usando Funções Utilitárias
 ```python
 from meteoplots.plots import plot_contourf_from_xarray
 from meteoplots.colorbars import custom_colorbar
@@ -278,7 +336,63 @@ plot_contourf_from_xarray(
 
 ---
 
-## 🎨 **Colorbars Automáticas**
+## �️ **Análise de Bacias Hidrográficas**
+
+A função `plot_contourf_from_xarray()` inclui funcionalidade especial para análise de bacias hidrográficas, calculando automaticamente valores médios por bacia e exibindo-os no mapa.
+
+### Como Funciona
+```python
+# Ativar análise de bacias
+plot_contourf_from_xarray(
+    xarray_data=data,
+    plot_var_colorbar='tp',
+    
+    # Parâmetros para bacias
+    shp_path_bacias='caminho/para/bacias.shp',
+    add_values_from_shapefile=True,
+    basin_column_name='Nome_Bacia'  # Coluna com ID das bacias
+)
+```
+
+### Funcionalidades da Análise de Bacias
+- **Cálculo automático**: Valor médio espacial para cada bacia
+- **Anotações no mapa**: Valores exibidos no centróide de cada bacia
+- **Flexibilidade**: Funciona com qualquer shapefile de polígonos
+- **Precisão**: Considera apenas pixels dentro de cada bacia
+
+### Requisitos do Shapefile
+- **Geometria**: Polígonos representando as bacias
+- **Coluna de identificação**: Nome ou código único para cada bacia
+- **Sistema de coordenadas**: Preferencialmente EPSG:4326 (lat/lon)
+
+### Exemplo Prático
+```python
+# Análise de precipitação por sub-bacias do São Francisco
+plot_contourf_from_xarray(
+    xarray_data=precipitacao_mensal,
+    plot_var_colorbar='tp',
+    title='Precipitação - Sub-bacias do Rio São Francisco',
+    
+    # Configuração das bacias
+    shp_path_bacias='dados/sub_bacias_sao_francisco.shp',
+    add_values_from_shapefile=True,
+    basin_column_name='CODIGO_BACIA',
+    
+    # Região de interesse
+    extent=[-50, -37, -18, -8],
+    label_colorbar='Precipitação (mm/mês)'
+)
+```
+
+### Casos de Uso
+- **Hidrologia**: Análise de precipitação por bacia
+- **Planejamento hídrico**: Distribuição de recursos
+- **Climatologia regional**: Padrões por região
+- **Agricultura**: Monitoramento de chuva por fazenda/região
+
+---
+
+## �🎨 **Colorbars Automáticas**
 
 A biblioteca inclui colorbars pré-configuradas para variáveis meteorológicas através da função `custom_colorbar()`.
 
