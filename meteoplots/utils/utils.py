@@ -1,27 +1,17 @@
 
-def calcula_media_bacia(dataset, lat, lon, bacia, codigo, shp):
+def calculate_mean_basin_value_from_shapefile(dataset, basin, shp, dim_lat='lat', dim_lon='lon'):
 
     import regionmask
     import pandas as pd
-    import numpy as np
 
-    if shp[shp['nome'] == bacia].geometry.values[0] is None:
-        # print(f'Não há pontos na bacia {bacia}. Código {codigo}. Pegando o mais próximo')
-        media = dataset.sel(latitude=lat, longitude=lon, method='nearest')
-        media = media.drop_vars(['latitude', 'longitude'])
-    else:
-        bacia_mask = regionmask.Regions(shp[shp['nome'] == bacia].geometry)
-        mask = bacia_mask.mask(dataset.longitude, dataset.latitude)
-        chuva_mask = dataset.where(mask == 0)
-        media = chuva_mask.mean(('latitude', 'longitude'))
+    mask = regionmask.Regions(shp[shp['Nome_Bacia'] == basin].geometry)
+    mask = mask.mask(dataset[dim_lon], dataset[dim_lat])
+    mask_var = dataset.where(mask==0)
+    mean_mask = mask_var.mean(dim=[dim_lat, dim_lon], skipna=True)
+    valor = mean_mask.item()
+    mean_mask = pd.DataFrame({"valor": [valor], "basin": [basin], dim_lat: [shp[shp['Nome_Bacia'] == basin].centroid.y.values[0]], dim_lon: [shp[shp['Nome_Bacia'] == basin].centroid.x.values[0]]})
 
-        if pd.isna(media['tp'].values.mean()):
-            # print(f'Não há pontos na bacia {bacia}. Código {codigo}. Pegando o mais próximo')
-            media = dataset.sel(latitude=lat, longitude=lon, method='nearest')
-            media = media.drop_vars(['latitude', 'longitude'])
-
-    return media.expand_dims({'id': [codigo]})
-
+    return mean_mask
 
 def figures_panel(path_figs: str | list, output_file='panel.png', path_to_save='./tmp/paineis/', img_size=(6,6), ncols=None, nrows=None):
 
@@ -69,3 +59,5 @@ def figures_panel(path_figs: str | list, output_file='panel.png', path_to_save='
         fig.savefig(f'{path_to_save}/{output_file}', dpi=300, bbox_inches="tight", pad_inches=0)
         print(f"✅ Painel salvo em: {output_file}")
         return f'{path_to_save}/{output_file}'
+
+

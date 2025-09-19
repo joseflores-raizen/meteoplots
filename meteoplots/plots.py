@@ -23,7 +23,7 @@ def get_base_ax(extent, figsize, central_longitude=0):
 def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='latitude', dim_lon='longitude', shapefiles=None, normalize_colorbar=False, **kwargs):
 
     from meteoplots.colorbar.colorbars import custom_colorbar
-    from meteoplots.utils.utils import calcula_media_bacia
+    from meteoplots.utils.utils import calculate_mean_basin_value_from_shapefile
     from matplotlib.colors import BoundaryNorm
     from mpl_toolkits.axes_grid1.inset_locator import inset_axes
     import geopandas as gpd
@@ -33,7 +33,7 @@ def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='lati
     '''Plot contourf data from an xarray DataArray'''
 
     # Default parameters
-    extent = kwargs.get('extent', [240, 360, -60, 20])
+    extent = kwargs.get('extent', [280, 330, -35, 10])
     figsize = kwargs.get('figsize', (12, 12))
     central_longitude = kwargs.get('central_longitude', 0)
     title_size = kwargs.get('title_size', 16)
@@ -105,54 +105,36 @@ def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='lati
     # Title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
 
-    # # Adicionando valores das bacias
-    # if kwargs.get('add_valor_bacias', False):
+    # add mean values from shapefile whit geometry centroids
+    shp_path_bacias = kwargs.get('shp_path_bacias', None)
+    add_values_from_shapefile = kwargs.get('add_values_from_shapefile', False)
+    basin_column_name = kwargs.get('basin_column_name', 'Nome_Bacia')
+    
+    if shp_path_bacias is not None and add_values_from_shapefile:
 
-    #     import xarray as xr
-    #     import pandas as pd
+        print("Calculating mean values for each basin...")
 
-    #     # criando a var para tp no dataset se nao existir, o valor será o mesmo
-    #     ds = ds.to_dataset()
-    #     if 'tp' not in ds.data_vars:
-    #         varname = list(ds.data_vars.keys())[0]  # pega o primeiro nome de variável
-    #         ds = ds.rename({varname: "tp"})
+        import pandas as pd
 
-    #     chuva_media = []
-    #     for lat, lon, bacia, codigo in zip(shp['lat'], shp['lon'], shp['nome'], shp['cod']):
-    #         chuva_media.append(calcula_media_bacia(ds, lat, lon, bacia, codigo, shp))
+        # criando a var para tp no dataset se nao existir, o valor será o mesmo
+        shp = gpd.read_file(shp_path_bacias).to_crs(epsg=4326)
+        shp['centroid'] = shp['geometry'].centroid
+        shp['lat'] = shp['centroid'].y
+        shp['lon'] = shp['centroid'].x
 
-    #     df = xr.concat(chuva_media, dim='id').to_dataframe().reset_index()
-    #     df = df.rename(columns={'id': 'cod_psat'})
-    #     df_ons = get_df_ons()
-    #     df = pd.merge(df, df_ons, on='cod_psat', how='left')
-    #     media_bacia = df.groupby(['nome_bacia'])[['tp', 'vl_lat', 'vl_lon']].mean().reset_index()
-    #     bacias_para_plotar = [
-    #         'grande',
-    #         'iguaçu',
-    #         'itaipu',
-    #         'jacuí',
-    #         'madeira',
-    #         'paranapane',
-    #         'paranaíba',
-    #         'tietê',
-    #         'uruguai',
-    #         'paraná',
-    #         'xingu',
-    #         'tocantins',
-    #         'são franci',
-    #     ]
+        mean_values = []
+        for basin in shp[basin_column_name].unique():
+            mean_value = calculate_mean_basin_value_from_shapefile(dataset=xarray_data, shp=shp, basin=basin, dim_lat=dim_lat, dim_lon=dim_lon)
+            mean_values.append(mean_value)
 
-    #     # Itera sobre as bacias e adiciona as anotações no mapa
-    #     for idx, row in media_bacia.iterrows():
+        media_bacia = pd.concat(mean_values, ignore_index=True)
 
-    #         if row['nome_bacia'].lower() in bacias_para_plotar:
+        # Itera sobre as bacias e adiciona as anotações no mapa
+        for _, row in media_bacia.iterrows():
 
-    #             if not np.isnan(row['tp']):  # Garante que há valor para exibir
-    #                 lon, lat = row["vl_lon"], row["vl_lat"]  # Extrai coordenadas do centroide
-    #                 lon = lon+360
-    #                 ax.text(lon, lat, f"{row['tp']:.0f}", fontsize=13, color='black', fontweight='bold', ha='center', va='center', transform=ccrs.PlateCarree())
-    #                         # bbox=dict(facecolor='white', alpha=0.7, edgecolor='none')c
-    #                         # )
+            lon, lat = row[dim_lon], row[dim_lat]  # Extrai coordenadas do centroide
+            lon = lon+360
+            ax.text(lon, lat, f"{row['valor']:.0f}", fontsize=13, color='black', fontweight='bold', ha='center', va='center', transform=ccrs.PlateCarree())
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
