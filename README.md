@@ -14,6 +14,89 @@ pip install git+https://github.com/joseflores-raizen/meteoplots.git
 
 ---
 
+## 📊 **Trabalhando com Dados xarray**
+
+A biblioteca meteoplots trabalha exclusivamente com objetos **`xarray.DataArray`** para dados meteorológicos. O xarray é a biblioteca padrão para manipulação de dados científicos multidimensionais em Python.
+
+### O que é xarray.DataArray?
+Um `xarray.DataArray` é uma estrutura de dados que combina:
+- **Valores numéricos** (dados meteorológicos)
+- **Coordenadas** (latitude, longitude, tempo, níveis)
+- **Metadados** (atributos, unidades, descrições)
+
+### Carregando Dados Meteorológicos
+```python
+import xarray as xr
+import numpy as np
+
+# Método 1: Carregar de arquivo NetCDF
+temperatura = xr.open_dataarray('temperatura_2m.nc')
+precipitacao = xr.open_dataset('precipitacao.nc')['tp']  # Extrair variável específica
+
+# Método 2: Criar dados sintéticos para testes
+lat = np.arange(-35, 10, 0.5)
+lon = np.arange(-75, -30, 0.5)
+temp_data = 20 + 10 * np.random.random((len(lat), len(lon)))
+
+temperatura = xr.DataArray(
+    temp_data,
+    coords=[('latitude', lat), ('longitude', lon)],
+    attrs={'units': '°C', 'long_name': 'Temperatura do Ar 2m'}
+)
+
+# Método 3: Converter de outros formatos
+import pandas as pd
+# De pandas DataFrame para xarray
+df = pd.read_csv('dados_estacoes.csv')
+data_xr = df.set_index(['lat', 'lon']).to_xarray()
+```
+
+### Estrutura Típica de Dados Meteorológicos
+```python
+# Visualizar estrutura do DataArray
+print(temperatura)
+# Output:
+# <xarray.DataArray 'temperature' (latitude: 90, longitude: 90)>
+# array([[15.2, 15.4, ...],
+#        [16.1, 16.3, ...], ...])
+# Coordinates:
+#   * latitude   (latitude) float64 -35.0 -34.5 ... 9.0 9.5
+#   * longitude  (longitude) float64 -75.0 -74.5 ... -30.5 -30.0
+# Attributes:
+#     units:      °C
+#     long_name:  Temperatura do Ar 2m
+```
+
+### Verificando Dimensões e Coordenadas
+```python
+# Verificar dimensões necessárias para meteoplots
+print("Dimensões:", list(temperatura.dims))  # Deve incluir 'latitude' e 'longitude'
+print("Coordenadas:", list(temperatura.coords))
+print("Shape:", temperatura.shape)
+
+# Renomear dimensões se necessário
+if 'lat' in temperatura.dims:
+    temperatura = temperatura.rename({'lat': 'latitude', 'lon': 'longitude'})
+```
+
+### Preparando Dados para Múltiplos Plots
+```python
+# Para plot_multipletypes_from_xarray, organize como dicionário
+dados_multiplos = {
+    'contourf': temperatura,      # Para plot preenchido
+    'contour': pressao,           # Para linhas de contorno  
+    'u_quiver': componente_u,     # Componente U do vento
+    'v_quiver': componente_v      # Componente V do vento
+}
+```
+
+### Dicas Importantes
+- **Coordenadas obrigatórias**: `latitude/lat` e `longitude/lon` ou 
+- **Ordem das dimensões**: Não importa, o xarray gerencia automaticamente
+- **Sistemas de coordenadas**: A biblioteca aceita lon 0-360° ou -180-180°
+
+---
+
 ## 🎯 Funções Principais
 
 ### 📊 **Funções de Plotagem**
