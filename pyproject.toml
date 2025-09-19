@@ -8,16 +8,4 @@ version = "0.1.0"
 description = "Funções para plotagem meteorológica"
 authors = [{ name = "Jose Flores" }]
 
-dependencies = [
-    "xarray",
-    "matplotlib",
-    "cartopy==0.24.1",
-    "numpy==1.26.4",
-    "netcdf4",
-    "eccodes",
-    "geopandas==0.13.2",
-    "pandas",
-    "regionmask==0.9.0",
-    "Shapely==1.8.5.post1",
-    "fiona==1.9.6",   
-]
+dependencies = []

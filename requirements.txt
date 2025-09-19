@@ -1,12 +1,11 @@
-matplotlib
 xarray
-cartopy
+matplotlib
+cartopy==0.24.1
+numpy==1.26.4
 netcdf4
 eccodes
 geopandas==0.13.2
-numpy==1.26.4
-pandas==2.3.1
+pandas
 regionmask==0.9.0
-Cartopy==0.24.1
 Shapely==1.8.5.post1
 fiona==1.9.6
