@@ -1,9 +1,15 @@
 def custom_colorbar(variavel_plotagem=None, help=False, custom=False):
-
+    
     import numpy as np
     import matplotlib.pyplot as plt
     from matplotlib.colors import ListedColormap, LinearSegmentedColormap, BoundaryNorm
 
+    # Initialize return variables
+    levels = None
+    colors = None
+    cmap = None
+    cbar_ticks = None
+    
     configs = {
         "chuva_ons": {
             "levels": [0, 1, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200],
@@ -225,6 +231,37 @@ def custom_colorbar(variavel_plotagem=None, help=False, custom=False):
                 LinearSegmentedColormap.from_list("CustomCmap", colors),
                 len(levels) + 1
             ),
+            "cbar_ticks": None,
+        },
+        "temperature": {  # Alias for temp850
+            "levels": lambda: np.arange(-14, 34, 1),
+            "colors": ['#8E27BA', '#432A98', '#1953A8', '#148BC1', '#15B3A4', '#16C597',
+                       '#77DE75', '#C5DD47', '#F5BB1A', '#F0933A', '#EF753D', '#F23B39',
+                       '#C41111', '#8D0A0A'],
+            "cmap": lambda colors, levels: plt.get_cmap(
+                LinearSegmentedColormap.from_list("CustomCmap", colors),
+                len(levels) + 1
+            ),
+            "cbar_ticks": None,
+        },
+        "precipitation": {  # Alias for tp_acumulada
+            "levels": [0, 1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 50, 60, 80,
+                       100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300],
+            "colors": ["#ffffff", "#e6e6e6", "#bebebe", "#969696", "#6e6e6e", "#c8ffbe",
+                       "#96f58c", "#50f050", "#1eb41e", "#057805", "#0a50aa", "#1464d2",
+                       "#2882f0", "#50a5f5", "#96d2fa", "#e1ffff", "#fffaaa", "#ffe878",
+                       "#ffc03c", "#ffa000", "#ff6000", "#ff3200", "#e11400", "#a50000",
+                       "#c83c3c", "#e67070", "#f8a0a0", "#ffe6e6", "#cdcdff", "#b4a0ff",
+                       "#8c78ff", "#6455dc", "#3c28b4"],
+            "cmap": None,
+            "cbar_ticks": None,
+        },
+        "slp": {  # Sea level pressure
+            "levels": [900, 950, 976, 986, 995, 1002, 1007, 1011, 1013, 1015, 1019, 1024, 1030, 1038, 1046, 1080],
+            "colors": ["#2b2e52", "#2a4d91", "#3e66c5", "#5498c6", "#54b3bc", "#56bfb7",
+                       "#87c2b6", "#c1ccc6", "#d7c6c8", "#dcc1a5", "#dfcd9b", "#dfba7a",
+                       "#d68856", "#c0575b", "#8f2c53"],
+            "cmap": lambda colors: ListedColormap(colors),
             "cbar_ticks": None,
         },
         "temp_anomalia": {

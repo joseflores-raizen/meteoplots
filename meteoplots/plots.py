@@ -658,7 +658,8 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat=
         os.makedirs(path_save, exist_ok=True)
         output_filename = kwargs.get('output_filename', 'multiple_plot.png')
         plt.savefig(f'{path_save}/{output_filename}', bbox_inches='tight')
-        plt.close(fig)
         print(f'✅ Plot saved as {path_save}/{output_filename}')
+        if not kwargs.get('keep_open', False):
+            plt.close(fig)
     
-    return
+    return fig, ax

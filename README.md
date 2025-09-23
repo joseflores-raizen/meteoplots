@@ -615,6 +615,207 @@ Temperatura do Ar - 2m (°C)
 
 ---
 
+## 🧪 **Testes**
+
+A biblioteca meteoplots inclui uma suíte abrangente de testes para garantir qualidade e confiabilidade.
+
+### Estrutura dos Testes
+```
+tests/
+├── __init__.py
+├── conftest.py           # Fixtures compartilhadas
+├── test_colorbars.py     # Testes para colorbars automáticas
+├── test_plots.py         # Testes para funções de plotagem
+├── test_utils.py         # Testes para utilitários
+└── test_integration.py   # Testes de integração
+```
+
+### Instalação das Dependências de Teste
+```bash
+# Instalar dependências básicas + testes
+pip install -e ".[test]"
+
+# Ou instalar dependências de desenvolvimento
+pip install -e ".[dev]"
+```
+
+### Executando os Testes
+
+#### Método 1: Script de Teste Simples
+```bash
+# Executar todos os testes
+python run_tests.py
+
+# Executar com cobertura
+python run_tests.py --coverage
+
+# Executar apenas testes rápidos
+python run_tests.py --fast
+
+# Executar com saída detalhada
+python run_tests.py --verbose
+```
+
+#### Método 2: Pytest Direto
+```bash
+# Todos os testes
+pytest
+
+# Com cobertura
+pytest --cov=meteoplots --cov-report=html
+
+# Testes específicos
+pytest tests/test_colorbars.py
+pytest tests/test_plots.py::TestPlotContourfFromXarray
+
+# Pular testes lentos
+pytest -m "not slow"
+```
+
+### Tipos de Teste
+
+#### 🔧 **Testes Unitários**
+- **Colorbars**: Validação de configurações, formatos, compatibilidade
+- **Plots**: Cada função de plotagem individualmente
+- **Utils**: Cálculos de bacia, geração de títulos, criação de painéis
+
+#### 🔗 **Testes de Integração**
+- **Workflows completos**: Análise meteorológica end-to-end
+- **Análise de bacias**: Integração com shapefiles
+- **Geração de painéis**: Combinação de múltiplas figuras
+- **Cenários reais**: Casos de uso típicos
+
+#### 📊 **Cobertura de Código**
+```bash
+# Gerar relatório de cobertura
+pytest --cov=meteoplots --cov-report=html
+
+# Visualizar no navegador
+open htmlcov/index.html  # Linux/Mac
+start htmlcov/index.html # Windows
+```
+
+### Fixtures Disponíveis
+
+#### 📈 **Dados de Teste**
+- `sample_temperature_data`: Dados de temperatura sintéticos
+- `sample_precipitation_data`: Dados de precipitação sintéticos 
+- `sample_pressure_data`: Dados de pressão sintéticos
+- `sample_wind_components`: Componentes U/V de vento
+- `sample_shapefile`: Shapefile temporário para testes
+
+#### 🛠️ **Utilitários**
+- `test_output_dir`: Diretório temporário para saídas
+- `matplotlib_backend`: Backend Agg para testes sem display
+- `data_generator`: Gerador de dados customizados
+
+### Exemplo de Teste Personalizado
+```python
+import pytest
+from meteoplots.plots import plot_contourf_from_xarray
+
+def test_custom_scenario(sample_temperature_data, test_output_dir):
+    """Teste para cenário específico."""
+    
+    fig, ax = plot_contourf_from_xarray(
+        xarray_data=sample_temperature_data,
+        plot_var_colorbar='temperature',
+        title='Teste Customizado',
+        savefigure=True,
+        path_save=test_output_dir,
+        output_filename='test_custom'
+    )
+    
+    # Verificações
+    assert fig is not None
+    assert len(ax.collections) > 0
+    
+    # Verificar arquivo salvo
+    import os
+    output_file = os.path.join(test_output_dir, 'test_custom.png')
+    assert os.path.exists(output_file)
+```
+
+### Configuração de CI/CD
+```yaml
+# .github/workflows/tests.yml
+name: Tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, '3.10', 3.11]
+    
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[test]"
+    
+    - name: Run tests
+      run: pytest --cov=meteoplots --cov-report=xml
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+```
+
+### Benchmarks de Performance
+```bash
+# Testar performance com datasets maiores
+pytest tests/test_integration.py::TestPerformanceIntegration -v
+
+# Profile de memória (requer memory_profiler)
+python -m memory_profiler tests/profile_memory.py
+```
+
+### Testes de Regressão
+```bash
+# Verificar compatibilidade com versões anteriores
+pytest tests/test_regression.py
+
+# Comparar saídas visuais
+pytest tests/test_visual_regression.py --baseline-dir=tests/baseline/
+```
+
+### Dicas para Desenvolvedores
+
+#### 🐛 **Debug de Testes**
+```bash
+# Executar com pdb
+pytest --pdb
+
+# Manter arquivos temporários para inspeção
+pytest --basetemp=debug_temp
+
+# Logs detalhados
+pytest -v -s --log-cli-level=DEBUG
+```
+
+#### 📝 **Adicionando Novos Testes**
+1. **Use fixtures existentes** sempre que possível
+2. **Isole testes** - cada teste deve ser independente
+3. **Mock operações complexas** (I/O, geospatial operations)
+4. **Teste casos extremos** e condições de erro
+5. **Documente comportamentos esperados**
+
+#### 🎯 **Melhores Práticas**
+- Testes devem ser **rápidos** (< 1s por teste unitário)
+- Use **nomes descritivos** para funções de teste
+- **Asserte comportamentos específicos**, não apenas ausência de erros
+- **Cleanup automático** de arquivos temporários
+- **Mock dependências externas** (APIs, arquivos grandes)
+
+---
+
 ## 📚 **Dependências**
 
 - `matplotlib`
