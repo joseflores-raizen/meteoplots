@@ -20,6 +20,30 @@ def get_base_ax(extent, figsize, central_longitude=0):
 
     return fig, ax
 
+def add_box_to_plot(ax, extent_boxes:list, **kwargs):
+
+    import matplotlib.patches as mpatches
+
+    '''Add a rectangular box to an existing plot'''
+
+    # Default parameters
+    edgecolor = kwargs.get('edgecolor', 'black')
+    facecolor = kwargs.get('facecolor', 'none')
+    linewidth = kwargs.get('linewidth', 2)
+    linestyle = kwargs.get('linestyle', '-')
+    alpha = kwargs.get('alpha', 1.0)
+
+    # Create a rectangle patch
+    for extent_box in extent_boxes:
+        rect = mpatches.Rectangle((extent_box[0], extent_box[2]), extent_box[1]-extent_box[0], extent_box[3]-extent_box[2],
+                                linewidth=linewidth, edgecolor=edgecolor, facecolor=facecolor, linestyle=linestyle, alpha=alpha,
+                                transform=ccrs.PlateCarree())
+
+        # Add the rectangle to the axes
+        ax.add_patch(rect)
+
+    return
+
 def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='latitude', dim_lon='longitude', shapefiles=None, normalize_colorbar=False, **kwargs):
 
     from meteoplots.colorbar.colorbars import custom_colorbar
@@ -136,6 +160,11 @@ def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='lati
             lon = lon+360
             ax.text(lon, lat, f"{row['valor']:.0f}", fontsize=13, color='black', fontweight='bold', ha='center', va='center', transform=ccrs.PlateCarree())
 
+    # Add box if extent_box is provided
+    box_patches = kwargs.get('box_patches', None)
+    if box_patches is not None:
+        add_box_to_plot(ax, box_patches, **kwargs)
+
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
         os.makedirs(path_save, exist_ok=True)
@@ -143,7 +172,6 @@ def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='lati
         plt.close(fig)
         print(f'✅ Plot saved as {path_save}/{output_filename}')
 
-        
     return fig, ax
 
 def plot_contour_from_xarray(xarray_data, dim_lat='latitude', dim_lon='longitude', shapefiles=None, **kwargs):
