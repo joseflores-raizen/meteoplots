@@ -469,7 +469,7 @@ plot_contourf_from_xarray(
 
 ---
 
-## �️ **Análise de Bacias Hidrográficas**
+## 🌊 **Análise de Bacias Hidrográficas**
 
 A função `plot_contourf_from_xarray()` inclui funcionalidade especial para análise de bacias hidrográficas, calculando automaticamente valores médios por bacia e exibindo-os no mapa.
 
@@ -525,7 +525,7 @@ plot_contourf_from_xarray(
 
 ---
 
-## �🎨 **Colorbars Automáticas**
+## 🎨 **Colorbars Automáticas**
 
 A biblioteca inclui colorbars pré-configuradas para variáveis meteorológicas através da função `custom_colorbar()`.
 
