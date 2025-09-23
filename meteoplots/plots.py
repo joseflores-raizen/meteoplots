@@ -662,4 +662,4 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat=
         if not kwargs.get('keep_open', False):
             plt.close(fig)
     
-    return fig, ax
+    return fig, ax 
