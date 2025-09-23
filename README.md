@@ -617,11 +617,14 @@ Temperatura do Ar - 2m (°C)
 
 ## 📚 **Dependências**
 
-- `matplotlib` >= 3.0
-- `cartopy` >= 0.18
-- `xarray` >= 0.16
-- `numpy` >= 1.18
-- `geopandas` >= 0.8 (opcional, para shapefiles)
+- `matplotlib`
+- `cartopy` == 0.24.1 (versão necessário para Análise de Bacias Hidrográficas)
+- `xarray`
+- `numpy` == 1.26.4 (versão necessária para Análise de Bacias Hidrográficas)
+- `geopandas` == 0.13.2 (versão necessária para Análise de Bacias Hidrográficas)
+- `regionmask` == 1.8.5.post1 (versão necessária para Análise de Bacias Hidrográficas)
+- `Shapely` == 0.9.0 (versão necessária para Análise de Bacias Hidrográficas)
+- `fiona` == 1.9.6 (versão necessária para Análise de Bacias Hidrográficas)
 
 ---
 
