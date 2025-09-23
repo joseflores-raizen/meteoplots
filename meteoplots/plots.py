@@ -27,11 +27,11 @@ def add_box_to_plot(ax, extent_boxes:list, **kwargs):
     '''Add a rectangular box to an existing plot'''
 
     # Default parameters
-    edgecolor = kwargs.get('edgecolor', 'black')
-    facecolor = kwargs.get('facecolor', 'none')
-    linewidth = kwargs.get('linewidth', 2)
-    linestyle = kwargs.get('linestyle', '-')
-    alpha = kwargs.get('alpha', 1.0)
+    edgecolor = kwargs.get('edgecolor_box', 'black')
+    facecolor = kwargs.get('facecolor_box', 'none')
+    linewidth = kwargs.get('linewidth_box', 1)
+    linestyle = kwargs.get('linestyle_box', '-')
+    alpha = kwargs.get('alpha_box', 1.0)
 
     # Create a rectangle patch
     for extent_box in extent_boxes:
