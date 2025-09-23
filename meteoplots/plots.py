@@ -217,6 +217,11 @@ def plot_contour_from_xarray(xarray_data, dim_lat='latitude', dim_lon='longitude
     # Title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
 
+    # Add box if extent_box is provided
+    box_patches = kwargs.get('box_patches', None)
+    if box_patches is not None:
+        add_box_to_plot(ax, box_patches, **kwargs)
+
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
         os.makedirs(path_save, exist_ok=True)
@@ -287,6 +292,11 @@ def plot_quiver_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon='lon
 
     # Title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
+
+    # Add box if extent_box is provided
+    box_patches = kwargs.get('box_patches', None)
+    if box_patches is not None:
+        add_box_to_plot(ax, box_patches, **kwargs)
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -383,6 +393,12 @@ def plot_streamplot_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon=
 
     # Title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
+
+    # Add box if extent_box is provided
+    box_patches = kwargs.get('box_patches', None)
+    if box_patches is not None:
+        add_box_to_plot(ax, box_patches, **kwargs)
+
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -631,9 +647,13 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat=
     # Set title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
 
+    # Add box if extent_box is provided
+    box_patches = kwargs.get('box_patches', None)
+    if box_patches is not None:
+        add_box_to_plot(ax, box_patches, **kwargs)
+
     # Handle saving
     savefigure = kwargs.get('savefigure', True)
-    
     if savefigure:
         os.makedirs(path_save, exist_ok=True)
         output_filename = kwargs.get('output_filename', 'multiple_plot.png')
