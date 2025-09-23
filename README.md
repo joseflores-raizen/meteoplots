@@ -255,6 +255,52 @@ fig, ax = plot_multipletypes_from_xarray(
 - `'quiver'`: Vetores de vento
 - `'streamplot'`: Linhas de fluxo
 
+### 🔲 **Função Utilitária**
+
+#### `add_box_to_plot()`
+Adiciona caixas retangulares (boxes) em plots existentes para destacar áreas de interesse.
+
+```python
+from meteoplots.plots import add_box_to_plot
+
+# Criar plot base
+fig, ax = plot_contourf_from_xarray(
+    xarray_data=temperatura_data,
+    plot_var_colorbar='temperature',
+    title='Temperatura com Área de Interesse'
+)
+
+# Adicionar caixas retangulares
+extent_boxes = [
+    [-55, -45, -25, -15],  # Box 1: [lon_min, lon_max, lat_min, lat_max]
+    [-50, -40, -30, -20]   # Box 2: Outra área de interesse
+]
+
+add_box_to_plot(
+    ax=ax,
+    extent_boxes=extent_boxes,
+    edgecolor_box='red',
+    linewidth_box=2,
+    linestyle_box='--',
+    alpha_box=0.8
+)
+```
+
+**Parâmetros:**
+- `ax`: Eixo matplotlib onde adicionar as caixas
+- `extent_boxes`: Lista de extensões geográficas [lon_min, lon_max, lat_min, lat_max]
+- `edgecolor_box`: Cor da borda (padrão: 'black')
+- `facecolor_box`: Cor de preenchimento (padrão: 'none')
+- `linewidth_box`: Espessura da linha (padrão: 1)
+- `linestyle_box`: Estilo da linha (padrão: '-')
+- `alpha_box`: Transparência (padrão: 1.0)
+
+**Casos de uso típicos:**
+- Destacar regiões de estudo específicas
+- Marcar áreas com eventos meteorológicos importantes
+- Delimitar zonas de interesse em análises climáticas
+- Sobrepor múltiplas áreas para comparação regional
+
 ---
 
 ## ⚙️ **Parâmetros Comuns**
