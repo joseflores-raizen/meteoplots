@@ -1,6 +1,7 @@
 
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
+import cartopy.feature as cfeature
 
 def get_base_ax(extent, figsize, central_longitude=0):
 
@@ -165,6 +166,16 @@ def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='lati
     if box_patches is not None:
         add_box_to_plot(ax, box_patches, **kwargs)
 
+    # Mask continets if requested
+    mask_continents = kwargs.get('mask_continents', False)
+    if mask_continents:
+        ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
+
+    # Mask oceans if requested
+    mask_oceans = kwargs.get('mask_oceans', False)
+    if mask_oceans:
+        ax.add_feature(cfeature.OCEAN, facecolor='lightgray', zorder=4)
+
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
         os.makedirs(path_save, exist_ok=True)
@@ -221,6 +232,16 @@ def plot_contour_from_xarray(xarray_data, dim_lat='latitude', dim_lon='longitude
     box_patches = kwargs.get('box_patches', None)
     if box_patches is not None:
         add_box_to_plot(ax, box_patches, **kwargs)
+
+    # Mask continets if requested
+    mask_continents = kwargs.get('mask_continents', False)
+    if mask_continents:
+        ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
+
+    # Mask oceans if requested
+    mask_oceans = kwargs.get('mask_oceans', False)
+    if mask_oceans:
+        ax.add_feature(cfeature.OCEAN, facecolor='lightgray', zorder=4)
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -297,6 +318,16 @@ def plot_quiver_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon='lon
     box_patches = kwargs.get('box_patches', None)
     if box_patches is not None:
         add_box_to_plot(ax, box_patches, **kwargs)
+
+    # Mask continets if requested
+    mask_continents = kwargs.get('mask_continents', False)
+    if mask_continents:
+        ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
+
+    # Mask oceans if requested
+    mask_oceans = kwargs.get('mask_oceans', False)
+    if mask_oceans:
+        ax.add_feature(cfeature.OCEAN, facecolor='lightgray', zorder=4)
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -399,6 +430,15 @@ def plot_streamplot_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon=
     if box_patches is not None:
         add_box_to_plot(ax, box_patches, **kwargs)
 
+    # Mask continets if requested
+    mask_continents = kwargs.get('mask_continents', False)
+    if mask_continents:
+        ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
+
+    # Mask oceans if requested
+    mask_oceans = kwargs.get('mask_oceans', False)
+    if mask_oceans:
+        ax.add_feature(cfeature.OCEAN, facecolor='lightgray', zorder=4)
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -651,6 +691,16 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat=
     box_patches = kwargs.get('box_patches', None)
     if box_patches is not None:
         add_box_to_plot(ax, box_patches, **kwargs)
+
+    # Mask continets if requested
+    mask_continents = kwargs.get('mask_continents', False)
+    if mask_continents:
+        ax.add_feature(cfeature.LAND, facecolor='lightgray', zorder=4)
+
+    # Mask oceans if requested
+    mask_oceans = kwargs.get('mask_oceans', False)
+    if mask_oceans:
+        ax.add_feature(cfeature.OCEAN, facecolor='lightgray', zorder=4)
 
     # Handle saving
     savefigure = kwargs.get('savefigure', True)
