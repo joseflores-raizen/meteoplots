@@ -179,13 +179,6 @@ def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='lati
     # Title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
 
-    # Add text annotations if provided
-    texts = kwargs.get('texts', None)
-    if texts is not None:
-        # Extract text-specific kwargs to avoid conflicts
-        text_kwargs = {k: v for k, v in kwargs.items() if k.startswith('text_')}
-        add_text_annotations(ax, texts, **text_kwargs)
-
     # add mean values from shapefile whit geometry centroids
     shp_path_bacias = kwargs.get('shp_path_bacias', None)
     add_values_from_shapefile = kwargs.get('add_values_from_shapefile', False)
@@ -231,6 +224,13 @@ def plot_contourf_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat='lati
     mask_oceans = kwargs.get('mask_oceans', False)
     if mask_oceans:
         ax.add_feature(cfeature.OCEAN, facecolor=kwargs.get('mask_oceans_facecolor', 'lightgray'), zorder=4)
+
+    # Add text annotations if provided
+    texts = kwargs.get('texts', None)
+    if texts is not None:
+        # Extract text-specific kwargs to avoid conflicts
+        text_kwargs = {k: v for k, v in kwargs.items() if k.startswith('text_')}
+        add_text_annotations(ax, texts, **text_kwargs)
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -284,13 +284,6 @@ def plot_contour_from_xarray(xarray_data, dim_lat='latitude', dim_lon='longitude
     # Title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
 
-    # Add text annotations if provided
-    texts = kwargs.get('texts', None)
-    if texts is not None:
-        # Extract text-specific kwargs to avoid conflicts
-        text_kwargs = {k: v for k, v in kwargs.items() if k.startswith('text_')}
-        add_text_annotations(ax, texts, **text_kwargs)
-
     # Add box if extent_box is provided
     box_patches = kwargs.get('box_patches', None)
     if box_patches is not None:
@@ -305,6 +298,13 @@ def plot_contour_from_xarray(xarray_data, dim_lat='latitude', dim_lon='longitude
     mask_oceans = kwargs.get('mask_oceans', False)
     if mask_oceans:
         ax.add_feature(cfeature.OCEAN, facecolor=kwargs.get('mask_oceans_facecolor', 'lightgray'), zorder=4)
+
+    # Add text annotations if provided
+    texts = kwargs.get('texts', None)
+    if texts is not None:
+        # Extract text-specific kwargs to avoid conflicts
+        text_kwargs = {k: v for k, v in kwargs.items() if k.startswith('text_')}
+        add_text_annotations(ax, texts, **text_kwargs)
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -377,13 +377,6 @@ def plot_quiver_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon='lon
     # Title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
 
-    # Add text annotations if provided
-    texts = kwargs.get('texts', None)
-    if texts is not None:
-        # Extract text-specific kwargs to avoid conflicts
-        text_kwargs = {k: v for k, v in kwargs.items() if k.startswith('text_')}
-        add_text_annotations(ax, texts, **text_kwargs)
-
     # Add box if extent_box is provided
     box_patches = kwargs.get('box_patches', None)
     if box_patches is not None:
@@ -398,6 +391,14 @@ def plot_quiver_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon='lon
     mask_oceans = kwargs.get('mask_oceans', False)
     if mask_oceans:
         ax.add_feature(cfeature.OCEAN, facecolor=kwargs.get('mask_oceans_facecolor', 'lightgray'), zorder=4)
+
+    # Add text annotations if provided
+    texts = kwargs.get('texts', None)
+    if texts is not None:
+        # Extract text-specific kwargs to avoid conflicts
+        text_kwargs = {k: v for k, v in kwargs.items() if k.startswith('text_')}
+        add_text_annotations(ax, texts, **text_kwargs)
+
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -495,13 +496,6 @@ def plot_streamplot_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon=
     # Title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
 
-    # Add text annotations if provided
-    texts = kwargs.get('texts', None)
-    if texts is not None:
-        # Extract text-related parameters to avoid conflicts
-        text_kwargs = {k: v for k, v in kwargs.items() if k.startswith('text_') or k in ['fontsize', 'color', 'ha', 'va', 'bbox', 'rotation', 'transform', 'alpha', 'weight', 'style', 'family']}
-        add_text_annotations(ax, texts, **text_kwargs)
-
     # Add box if extent_box is provided
     box_patches = kwargs.get('box_patches', None)
     if box_patches is not None:
@@ -516,6 +510,14 @@ def plot_streamplot_from_xarray(xarray_u, xarray_v, dim_lat='latitude', dim_lon=
     mask_oceans = kwargs.get('mask_oceans', False)
     if mask_oceans:
         ax.add_feature(cfeature.OCEAN, facecolor=kwargs.get('mask_oceans_facecolor', 'lightgray'), zorder=4)
+
+    # Add text annotations if provided
+    texts = kwargs.get('texts', None)
+    if texts is not None:
+        # Extract text-related parameters to avoid conflicts
+        text_kwargs = {k: v for k, v in kwargs.items() if k.startswith('text_') or k in ['fontsize', 'color', 'ha', 'va', 'bbox', 'rotation', 'transform', 'alpha', 'weight', 'style', 'family']}
+        add_text_annotations(ax, texts, **text_kwargs)
+
 
     savefigure_kwargs = kwargs.get('savefigure', True)
     if savefigure_kwargs:
@@ -764,13 +766,6 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat=
     # Set title
     ax.set_title(title, fontsize=title_size, loc=title_loc)
 
-    # Add text annotations if provided
-    texts = kwargs.get('texts', None)
-    if texts is not None:
-        # Extract text-related parameters to avoid conflicts
-        text_kwargs = {k: v for k, v in kwargs.items() if k.startswith('text_') or k in ['fontsize', 'color', 'ha', 'va', 'bbox', 'rotation', 'transform', 'alpha', 'weight', 'style', 'family']}
-        add_text_annotations(ax, texts, **text_kwargs)
-
     # Add box if extent_box is provided
     box_patches = kwargs.get('box_patches', None)
     if box_patches is not None:
@@ -785,6 +780,13 @@ def plot_multipletypes_from_xarray(xarray_data, plot_var_colorbar=None, dim_lat=
     mask_oceans = kwargs.get('mask_oceans', False)
     if mask_oceans:
         ax.add_feature(cfeature.OCEAN, facecolor=kwargs.get('mask_oceans_facecolor', 'lightgray'), zorder=4)
+
+    # Add text annotations if provided
+    texts = kwargs.get('texts', None)
+    if texts is not None:
+        # Extract text-related parameters to avoid conflicts
+        text_kwargs = {k: v for k, v in kwargs.items() if k.startswith('text_') or k in ['fontsize', 'color', 'ha', 'va', 'bbox', 'rotation', 'transform', 'alpha', 'weight', 'style', 'family']}
+        add_text_annotations(ax, texts, **text_kwargs)
 
     # Handle saving
     savefigure = kwargs.get('savefigure', True)
