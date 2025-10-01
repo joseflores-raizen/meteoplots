@@ -615,6 +615,184 @@ Temperatura do Ar - 2m (°C)
 
 ---
 
+# Text Annotation Feature Documentation
+
+## Overview
+The meteoplots library now supports text annotations on all plot functions. You can add custom text labels to your meteorological plots with flexible positioning and styling options.
+
+## Usage
+
+### Basic Text Annotations
+
+```python
+import numpy as np
+import xarray as xr
+from meteoplots.plots import plot_contourf_from_xarray
+
+# Create sample data
+lon = np.linspace(-10, 10, 20)
+lat = np.linspace(30, 50, 15)
+temperature = 20 + 5 * np.random.randn(len(lat), len(lon))
+
+temp_data = xr.DataArray(
+    temperature,
+    coords=[('latitude', lat), ('longitude', lon)],
+    attrs={'units': '°C'}
+)
+
+# Define text annotations
+texts = [
+    {'text': 'High Temperature Zone', 'lon': 5, 'lat': 40},
+    {'text': 'Low Temperature Zone', 'lon': -5, 'lat': 35}
+]
+
+# Create plot with text annotations
+fig, ax = plot_contourf_from_xarray(
+    temp_data,
+    plot_var_colorbar='temperature',
+    title='Temperature Analysis with Annotations',
+    texts=texts  # Add this parameter
+)
+```
+
+### Advanced Styling Options
+
+```python
+# Text annotations with advanced styling
+texts = [
+    {
+        'text': 'Critical Area',
+        'lon': 0, 'lat': 40,
+        'fontsize': 14,
+        'color': 'red',
+        'weight': 'bold',
+        'ha': 'center',
+        'va': 'center',
+        'bbox': {
+            'boxstyle': 'round,pad=0.3',
+            'facecolor': 'yellow',
+            'alpha': 0.7,
+            'edgecolor': 'black'
+        }
+    },
+    {
+        'text': 'Station A',
+        'lon': -3, 'lat': 45,
+        'fontsize': 12,
+        'color': 'blue',
+        'rotation': 45,
+        'alpha': 0.8
+    }
+]
+```
+
+### Coordinate Systems
+
+The text annotation feature supports multiple coordinate naming conventions:
+
+1. **Longitude/Latitude**: `'lon'`, `'lat'`
+2. **Full names**: `'longitude'`, `'latitude'`  
+3. **Cartesian**: `'x'`, `'y'`
+
+```python
+# Different coordinate systems
+texts = [
+    {'text': 'Point 1', 'lon': 5, 'lat': 40},           # lon/lat
+    {'text': 'Point 2', 'longitude': -5, 'latitude': 35}, # full names
+    {'text': 'Point 3', 'x': 0, 'y': 42}                # x/y
+]
+```
+
+### Available Styling Parameters
+
+- **`fontsize`**: Text size (default: 12)
+- **`color`**: Text color (default: 'black')
+- **`weight`** or **`fontweight`**: Font weight ('normal', 'bold', etc.)
+- **`ha`**: Horizontal alignment ('left', 'center', 'right')
+- **`va`**: Vertical alignment ('top', 'center', 'bottom')
+- **`rotation`**: Text rotation angle in degrees
+- **`alpha`**: Text transparency (0-1)
+- **`bbox`**: Background box styling (dictionary)
+- **`style`**: Font style ('normal', 'italic', 'oblique')
+- **`family`**: Font family ('serif', 'sans-serif', 'monospace')
+
+### Supported Plot Functions
+
+Text annotations work with all meteoplots functions:
+
+- `plot_contourf_from_xarray()`
+- `plot_contour_from_xarray()`
+- `plot_quiver_from_xarray()`
+- `plot_streamplot_from_xarray()`
+- `plot_multipletypes_from_xarray()`
+
+### Example: Weather Analysis with Annotations
+
+```python
+# Complete example for weather analysis
+texts = [
+    {
+        'text': 'High Pressure\n1025 hPa',
+        'lon': -2, 'lat': 45,
+        'fontsize': 11,
+        'color': 'darkred',
+        'weight': 'bold',
+        'ha': 'center',
+        'bbox': {
+            'boxstyle': 'round,pad=0.4',
+            'facecolor': 'lightblue',
+            'alpha': 0.8
+        }
+    },
+    {
+        'text': 'Low Pressure\n995 hPa',
+        'lon': 7, 'lat': 38,
+        'fontsize': 11,
+        'color': 'darkblue',
+        'weight': 'bold',
+        'ha': 'center',
+        'bbox': {
+            'boxstyle': 'round,pad=0.4',
+            'facecolor': 'lightcoral',
+            'alpha': 0.8
+        }
+    },
+    {
+        'text': 'Cold Front',
+        'lon': 0, 'lat': 35,
+        'fontsize': 10,
+        'color': 'blue',
+        'rotation': -30,
+        'weight': 'bold'
+    }
+]
+
+fig, ax = plot_contourf_from_xarray(
+    pressure_data,
+    plot_var_colorbar='slp',
+    title='Synoptic Analysis with Pressure Systems',
+    texts=texts,
+    figsize=(12, 8)
+)
+```
+
+## Notes
+
+- Text coordinates use the same coordinate system as your data
+- All text is rendered using Cartopy's PlateCarree projection by default
+- The `bbox` parameter accepts any matplotlib bbox properties
+- Text annotations are added after the main plot but before saving
+- Multiple text annotations can be added in a single plot
+
+## Error Handling
+
+If required coordinates are missing, a warning will be printed:
+```
+Warning: Text annotation missing required keys (x,y or lon,lat or longitude,latitude) and text: {...}
+```
+
+The missing annotation will be skipped, and the rest of the plot will render normally.
+
 ## 🧪 **Testes**
 
 A biblioteca meteoplots inclui uma suíte abrangente de testes para garantir qualidade e confiabilidade.
